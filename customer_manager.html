@@ -1,0 +1,74 @@
+<div class='container-fluid h-100' style='margin:0; padding:0;'>
+  <div class='row h-100'>
+    <div class='col col-md-3 d-flex flex-column h-100' id='left-window'>
+      <div class='btn-group border-silver' style='display:flex;'>
+        <button class='btn btn-light' type='button' style='flex:1' onclick='addCustomer()'>+</button>
+
+        <div class='dropdown' style='flex:1'>
+          <button class='btn btn-light w-100' data-toggle='dropdown' type='button'> &#128269;</button>
+          <form class='dropdown-menu p-0 border-info' onsubmit='loadCustomer(); return false;'>
+            <input class='dropdown-item form-control' name='search_customer' />
+            <input class='d-none' type='submit' />
+          </form>
+        </div>
+
+      </div>
+      <div id='left-window-customerlist' class='flex-grow-1' style="overflow:scroll; "></div>
+    </div>
+    <div id='right-window' class='col col-md-9 h-100'></div>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    loadCustomer();
+    var rand = Math.random()*1000
+    $('#right-window').load('customer_form.html?v='+rand);
+  })
+
+  // load Customer list //
+  function loadCustomer() {
+    var search_customer = $('[name="search_customer"]').val();
+     // console.log(search_customer);
+    if (!search_customer) {
+      $.get('customer_load_data.php', displayCustomerlist);
+    } else {
+      $.get('customer_load_data.php?customer=' + search_customer, displayCustomerlist);
+    }
+  }
+
+  function displayCustomerlist(data, status) {
+    datas = JSON.parse(data);
+    var ul = $('<ul class="list-group">')
+    for (i in datas) {
+      var li = $('<li class="list-group-item">').text(datas[i]['SHORT_NAME']).data('customer_record', JSON.stringify(datas[i])).addClass('hover');
+      li.on('click', function() {
+        showCustomerCard(this)
+      })
+      ul.append(li);
+    }
+    $('#left-window-customerlist').empty().append(ul);
+  }
+
+
+  // show user record 
+  function showCustomerCard(ele) {
+    var string = $(ele).data('customer_record');
+    var data = JSON.parse(string);
+    var fields = Object.keys(data);
+    var card = $('#customer_form');
+    $('#customer-title').text(data['SHORT_NAME']);
+    for (i in fields) {
+      card.find('[name="' + fields[i] + '"]').val(data[fields[i]]);
+    }
+    card.find('[name="SHORT_NAME"]').attr('readonly', true);
+  }
+
+  //add user
+  function addCustomer() {
+    $('#customer-title').text('新增客户');
+    $("#customer_form").trigger("reset")
+    $('#customer_form [name="SHORT_NAME"]').attr('readonly', false);    
+  }
+
+</script>

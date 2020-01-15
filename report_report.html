@@ -1,0 +1,58 @@
+<div id='window_report_main' class='d-flex flex-grow-1 w-100' style='overflow:scroll;'>report</div>
+
+<script>
+  $(function () {
+    var select = $('#report_sql_select').text();
+    var where = $('#report_where').text();
+    var group_by = $('#report_sql_group_by').text()
+    var order_by = $('#report_sql_order_by').text()
+
+    $.post(
+      'report.php', {
+        select: select,
+        where: where,
+        group_by: group_by,
+        order_by: order_by
+      },
+      reportShow
+    )
+  })
+
+
+  function reportShow(data, status) {
+
+    if (data =='[]') {
+      message('无数据');
+      return;
+    }
+
+    var datas = JSON.parse(data);
+    var labels = Object.keys(datas[0]);
+
+    var table = $('<table id="report_for_copy" class="table table-sm " style="" >')
+
+    // thead //
+    var thead = $('<thead>');
+    table.append(thead);
+    var tr = $('<tr>');
+    thead.append(tr);
+    for (i in labels) {
+      var th = $('<td class="text-nowrap bg-secondary" style="position:sticky; top:0; font-weight:300; color:white;">')
+        .text(labels[i]);
+      tr.append(th)
+    }
+
+    // body //
+    tbody = $('<tbody>');
+    table.append(tbody);
+    for (i in datas) {
+      tr = $('<tr>')
+      for (j in labels) {
+        td = $('<td class="text-nowrap">').text(datas[i][labels[j]]);
+        tr.append(td);
+      }
+      tbody.append(tr);
+    }
+    $('#window_report_main').empty().append(table);
+  }
+</script>

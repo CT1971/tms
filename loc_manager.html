@@ -1,0 +1,73 @@
+<div class='container-fluid h-100 p-0 m-0'>
+  <div class='row h-100'>
+    <div class='col col-md-3 d-flex flex-column h-100' id='left-window'>
+      <div class='btn-group border-silver' style='display:flex;'>
+        <button class='btn btn-light' type='button' style='flex:1' onclick='addLoc()'>+</button>
+
+        <div class='dropdown' style='flex:1'>
+          <button class='btn btn-light w-100' data-toggle='dropdown' type='button'> &#128269;</button>
+          <form class='dropdown-menu p-0 border-info' onsubmit='loadLoc(); return false;'>
+            <input class='dropdown-item form-control' name='search_loc' />
+            <input class='d-none' type='submit' />
+          </form>
+        </div>
+
+      </div>
+      <div id='left-window-loclist' class='flex-grow-1' style="overflow:scroll; "></div>
+    </div>
+    <div id='right-window' class='col col-md-9'></div>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    loadLoc();
+    $('#right-window').load('loc_form.html?v=4');
+  })
+
+  // load loc list //
+  function loadLoc() {
+    var search_loc = $('[name="search_loc"]').val();
+    //console.log(search_loc);
+    if (!search_loc) {
+      $.get('loc_load_data.php', displayLoclist);
+    } else {
+      $.get('loc_load_data.php?loc=' + search_loc, displayLoclist);
+    }
+  }
+
+  function displayLoclist(data, status) {
+    datas = JSON.parse(data);
+    var ul = $('<ul class="list-group">')
+    for (i in datas) {
+      var li = $('<li class="list-group-item">').text(datas[i]['FULL_NAME']).data('loc_record', JSON.stringify(datas[i])).addClass('hover');
+      li.on('click', function() {
+        showLocCard(this)
+      })
+      ul.append(li);
+    }
+    $('#left-window-loclist').empty().append(ul);
+  }
+
+
+  // show user record 
+  function showLocCard(ele) {
+    var string = $(ele).data('loc_record');
+    var data = JSON.parse(string);
+    var fields = Object.keys(data);
+    var card = $('#loc_form');
+    $('#loc-title').text(data['FULL_NAME']);
+    for (i in fields) {
+      card.find('[name="' + fields[i] + '"]').val(data[fields[i]]);
+    }
+    card.find('[name="FULL_NAME"]').attr('readonly', true);
+  }
+
+  //add user
+  function addLoc() {
+    $('#loc-title').text('新增地点');
+    $("#loc_form").trigger("reset")
+    //    $("#loc_form").find('[name="FULL_NAME"]').attr('readonly',true);
+  }
+
+</script>

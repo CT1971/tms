@@ -1,0 +1,746 @@
+<div class='d-flex flex-column' style='height:100%; overflow:scroll;'>
+  <div class='bg-light w-100 d-flex form-inline'>
+    <select id='sheet_station' class='form-control border-0 rounded-0 mr-3' style="border-radius:0; -webkit-appearance: none;
+    -webkit-border-radius: 0px;">
+      <option selected disabled>站点选择</option>
+    </select>
+    <span id='sheet_check_count' class=''></span>
+    <span id='sheet_check_result' class=''></span>
+    <i class='material-icons md-24 align-self-center' onclick='batchUpload()'>cloud_upload</i>
+  </div>
+
+  <div id='upload_container' class='' style="overflow:scroll; position:relative; flex-grow:1">
+  </div>
+</div>
+
+<script>
+  $(function () {
+    buildEmptySheet();
+    $('.sheet_cell').on('paste', handlePaste);
+
+    var session_scopes = $('#session_scope').text().split(',');
+    for (i in session_scopes) {
+      var $option = $('<option>').text(session_scopes[i]);
+      $('#sheet_station').append($option);
+    }
+  });
+
+
+  function buildEmptySheet() {
+    var sheet_set = [{
+        label: '客户(必填)',
+        list: 'customer_list',
+        value: ""
+      }, {
+        label: '客户订单号',
+        list: null,
+        value: ""
+      }, {
+        label: '参考号1',
+        list: null,
+        value: ""
+      }, {
+        label: '参考号2',
+        list: null,
+        value: ""
+      }, {
+        label: '发车日期',
+        list: null,
+        value: ""
+      }, {
+        label: '预期到达',
+        list: null,
+        value: ""
+      }, {
+        label: '运输模式(客户)',
+        list: null,
+        value: ""
+      }, {
+        label: '发货人',
+        list: null,
+        value: ""
+      }, {
+        label: '收货人',
+        list: null,
+        value: ""
+      }, {
+        label: '收货联系人',
+        list: null,
+        value: ""
+      }, {
+        label: '联系电话',
+        list: null,
+        value: ""
+      },
+      {
+        label: '始发地',
+        list: 'location_list',
+        value: ""
+      }, {
+        label: '始发地址',
+        list: null,
+        value: ""
+      }, {
+        label: '目的地',
+        list: 'location_list',
+        value: ""
+      }, {
+        label: '送货地址',
+        list: null,
+        value: ""
+      }, {
+        label: '产品',
+        list: null,
+        value: ""
+      }, {
+        label: '产品类型',
+        list: null,
+        value: "普货"
+      }, {
+        label: '数量',
+        list: null,
+        value: ""
+      }, {
+        label: '包装',
+        list: null,
+        value: ""
+      }, {
+        label: '体积(CBM)',
+        list: null,
+        value: ""
+      }, {
+        label: '重量(KG)',
+        list: null,
+        value: ""
+      }, {
+        label: '计费体重(吨/立方)',
+        list: null,
+        value: ""
+      }, {
+        label: '货值',
+        list: null,
+        value: ""
+      }, {
+        label: '客户备注',
+        list: null,
+        value: ""
+      }, {
+        label: '内部备注',
+        list: null,
+        value: ""
+      }, {
+        label: '操作备注',
+        list: null,
+        value: ""
+      }, {
+        label: '供应商运输模式',
+        list: null,
+        value: ""
+      }, {
+        label: '财务月度',
+        list: null,
+        value: ""
+      }, {
+        label: '零担单价',
+        list: null,
+        value: "0"
+      }, {
+        label: '包干费',
+        list: null,
+        value: "0"
+      }, {
+        label: '整车费',
+        list: null,
+        value: "0"
+      }, {
+        label: '零担费',
+        list: null,
+        value: "0"
+      }, {
+        label: '提货费',
+        list: null,
+        value: "0"
+      }, {
+        label: '送货费',
+        list: null,
+        value: "0"
+      }, {
+        label: '其他收费1',
+        list: null,
+        value: "0"
+      }, {
+        label: '其他收费2',
+        list: null,
+        value: "0"
+      }
+    ];
+
+    // var sheet_heads = ['客户(必填)', '客户订单号', '参考号1', '参考号2', '发车日期', '预期到达', '运输模式(客户)', '发货人', '收货人', '收货联系人', '联系电话',
+    //   '始发地', '始发地址', '目的地', '送货地址', '产品', '产品类型', '数量', '包装', '体积(CBM)', '重量(KG)', '计费重量(KG)', '货值', '客户备注', '内部备注',
+    //   '操作备注', '供应商运输模式', '财务月度', '零担单价', '包干费', '整车费', '零担费', '提货费', '送货费', '其他收费1', '其他收费2'
+    // ]
+
+    var sheet_rows = 100;
+    var sheet_cols = sheet_set.length; // sheet_cols = sheet_heads.length;
+
+    var sheet = $('<div id="sheet" data-clickX="0" data-clickY="0">');
+    $('#upload_container').empty().append(sheet);
+
+    // head//
+    head = $('<div class="sheet_head" style="display:flex; position:sticky; top:0;">');
+    for (i in sheet_set) { //sheet_heads) {
+      var div = $(
+          '<div class="bg-secondary text-white p-1 border-top border-right text-nowrap" style="min-width:120px;">')
+        .text(sheet_set[i]['label']);
+      // sheet_heads[i]);
+      head.append(div);
+    }
+    sheet.append(head);
+
+    for (y = 0; y < sheet_rows; y++) {
+      var row = $('<div class="sheet_row" style="display:flex;">');
+      sheet.append(row);
+      for (x = 0; x < sheet_cols; x++) {
+        var cell = $(
+          '<div class="sheet_cell p-1 border-top border-right" contentEditable="true" style="min-width:120px">').text(
+          sheet_set[x]['value']);
+        cell.attr('data-y', y); //.data('yy', y);
+        cell.attr('data-x', x); //cell.data('xx', x);
+        cell.on('click', clickCheckShift);
+        cell.on('keyup', checkDel);
+        cell.on('blur', trimContent);
+        if(sheet_set[x]['list']){
+          cell.attr('contentEditable','false');
+          cell.data('list',sheet_set[x]['list']);
+
+          cell.on('click',function(){
+            cell_value = $(this).text();
+            cell_list = $(this).data('list');
+            inp =$('<input type="text" onclick="event.stopPropagation()" onchange="$(this).parent().text($(this).val()); $(this).remove()" onfocusout="$(this).parent().text($(this).val()); $(this).remove()" style="border:1px solid green; background:white; outline:none;">');
+            inp.attr('list',cell_list);
+            inp.val(cell_value);
+            $(this).append(inp);
+            inp.focus();
+          })
+        }
+        row.append(cell);
+      }
+    }
+  }
+
+  // check if shift was entered when clicking, will create a block if so.
+  function clickCheckShift(e) {
+    $('#sheet div').css('background', 'none')
+    if (e.shiftKey) {
+      var lastX = $('#sheet').data('clickX');
+      var lastY = $('#sheet').data('clickY');
+      var currentX = $(this).data('x');
+      var currentY = $(this).data('y');
+      var x_min = Math.min(lastX, currentX);
+      var x_max = Math.max(lastX, currentX);
+      var y_min = Math.min(lastY, currentY);
+      var y_max = Math.max(lastY, currentY);
+      for (i = y_min; i <= y_max; i++) {
+        for (j = x_min; j <= x_max; j++) {
+          $('#sheet div[data-y="' + i + '"][data-x="' + j + '"]').css('background', 'rgba(230,230,230,0.6)');
+        }
+        $('#sheet').data('block', 'block');
+      }
+
+    } else { // normal click
+      $('#sheet').data('clickX', $(this).data('x'));
+      $('#sheet').data('clickY', $(this).data('y'));
+      $('#sheet').data('block', 'none');
+    }
+  }
+
+  // when press DEL in cell, will check if block is selected, if so , delete all data in block
+  function checkDel(e) {
+    if (e.keyCode == 46 || e.keyCode == 8) {
+      var block = $('#sheet').data('block');
+      if (block == 'block') { // if block was found
+        var lastX = $('#sheet').data('clickX');
+        var lastY = $('#sheet').data('clickY');
+        var currentX = $(this).data('x');
+        var currentY = $(this).data('y');
+        var x_min = Math.min(lastX, currentX);
+        var x_max = Math.max(lastX, currentX);
+        var y_min = Math.min(lastY, currentY);
+        var y_max = Math.max(lastY, currentY);
+        for (i = y_min; i <= y_max; i++) {
+          for (j = x_min; j <= x_max; j++) {
+            $('#sheet div[data-y="' + i + '"][data-x="' + j + '"]').text('');
+          }
+        }
+      }
+    }
+
+  }
+
+  function trimContent(e) {
+    $(this).text($(this).text().trim());
+  }
+
+
+  function handlePaste(e) {
+    // Stop data actually being pasted into div
+    e.stopPropagation();
+    e.preventDefault();
+
+    var x = $(this).data('x') * 1
+    var y = $(this).data('y') * 1
+
+    // cliboardData convert to [[]] //
+    var clipboardData, pastedData;
+
+    clipboardData = e.originalEvent.clipboardData.getData("text/plain");
+    datas = clipboardData.split('\n');
+    for (i in datas) {
+      datas[i] = datas[i].split('\t');
+    }
+
+    // insert data into divs //
+    for (i = 0; i < datas.length; i++) {
+      for (j = 0; j < datas[0].length; j++) {
+        yy = y + i;
+        xx = x + j;
+        $('div[data-y="' + yy + '"][data-x="' + xx + '"]').text(datas[i][j]);
+      }
+    }
+  }
+
+
+  function batchUpload() {
+    var station_check = $('#sheet_station').val();
+    if (!station_check) {
+      message('选择站点');
+      return;
+    }
+
+    // get #sheet data //
+    var raw_datas = [];
+    var row = [];
+    $('#sheet .sheet_row').each(function (i, ele) {
+      row = [];
+      $(ele).find('.sheet_cell').each(function (j, cell) {
+        row.push($(cell).text());
+      });
+      raw_datas.push(row);
+    })
+
+    // slim datas to only have first column ;
+    var datas = [];
+    for (i in raw_datas) {
+      if (raw_datas[i][0] == '') {
+        break;
+      }
+      datas.push(raw_datas[i]);
+    }
+
+    if (datas.length == 0) {
+      message('无数据');
+      return;
+    }
+
+    //console.log(JSON.stringify(datas));
+
+    // validating data //
+    var validateColumns = [{
+        label: '客户',
+        field: 'CUSTOMER',
+        column: 0,
+        command: 'isCustomer'
+      },
+      {
+        label: '发车日期',
+        field: 'DEP_DATE',
+        column: 4,
+        command: 'isDateOrEmpty'
+      },
+      {
+        label: '预期到达',
+        field: 'ETA_DATE',
+        column: 5,
+        command: 'isDateOrEmpty'
+      },
+      {
+        label: '客户运输模式',
+        field: 'CS_MODE',
+        column: 6,
+        command: 'isOption',
+        options: ['零担', '短驳', '整车', '冷藏', '', '海运', '空运', '其他']
+      },
+      {
+        label: '始发地',
+        field: 'ORI',
+        column: 11,
+        command: 'isLocation'
+      },
+      {
+        label: '目的地',
+        field: 'DEST',
+        column: 13,
+        command: 'isLocation'
+      },
+      {
+        label: '数量',
+        field: 'QUANTITY',
+        column: 17,
+        command: 'isNumber'
+      },
+      {
+        label: '体积',
+        field: 'VOLUME',
+        column: 19,
+        command: 'isNumber'
+      },
+
+      {
+        label: '重量',
+        field: 'WEIGHT',
+        column: 20,
+        command: 'isNumber'
+      },
+
+      {
+        label: '计费体积重量',
+        field: 'CHARGABLE_VW',
+        column: 21,
+        command: 'isNumber'
+      },
+
+      {
+        label: '货值',
+        field: 'VALUE',
+        column: 22,
+        command: 'isNumber'
+      },
+      {
+        label: '供应商运输模式',
+        field: 'VENDOR_MODE',
+        column: 26,
+        command: 'isOption',
+        options: ['零担', '短驳', '整车', '冷藏', '', '海运', '空运', '其他']
+      },
+      {
+        label: '财务月度',
+        field: 'ACC_MON',
+        column: 27,
+        command: 'isAccmon',
+      },
+      {
+        label: '零担单价',
+        field: 'R_LTL_RATE',
+        column: 28,
+        command: 'isNumber'
+      },
+      {
+        label: '包干费',
+        field: 'R_ALLIN',
+        column: 29,
+        command: 'isNumber'
+      },
+      {
+        label: '整车费',
+        field: 'R_FTL',
+        column: 30,
+        command: 'isNumber'
+      },
+      {
+        label: '零担费',
+        field: 'R_LTL',
+        column: 31,
+        command: 'isNumber'
+      },
+      {
+        label: '提货费',
+        field: 'R_PICKUP',
+        column: 32,
+        command: 'isNumber'
+      },
+      {
+        label: '送货费',
+        field: 'R_DELIVERY',
+        column: 33,
+        command: 'isNumber'
+      },
+      {
+        label: '其他收费1',
+        field: 'R_OTH1',
+        column: 34,
+        command: 'isNumber'
+      },
+      {
+        label: '其他收费2',
+        field: 'R_OTH2',
+        column: 35,
+        command: 'isNumber'
+      }
+    ]
+
+    // update check_count//
+    var sheet_check_count = Object.keys(validateColumns).length;
+    $('#sheet_check_count').text(sheet_check_count);
+
+    $('#sheet_check_result').text('发现错误 -> ')
+    var sheet_check_result = '';
+    for (v in validateColumns) {
+      var label = validateColumns[v]['label'];
+      var column = validateColumns[v]['column'];
+      var command = validateColumns[v]['command'];
+      var options = validateColumns[v]['options'];
+
+      var v_datas = []; // data to be validated 
+      for (i in datas) {
+        v_datas.push(datas[i][column])
+      }
+
+      switch (command) {
+        case 'isCustomer':
+          isCustomer(v_datas, column, label); // callback within isCustomer - because of $.get() 
+          break;
+        case 'isDateOrEmpty':
+          isDateOrEmpty(v_datas, column, label, showCheckResult);
+          break;
+        case 'isNumber':
+          isNumber(v_datas, column, label, showCheckResult);
+          break;
+        case 'isOption':
+          isOption(v_datas, column, label, options, showCheckResult);
+          break;
+        case 'isLocation':
+          isLocation(v_datas, column, label); // callback within isCustomer - because of $.get() 
+          break;
+        case 'isAccmon':
+          isAccmon(v_datas, column, label, showCheckResult); // callback within isCustomer - because of $.get() 
+          break;
+
+        default:
+          break;
+      }
+    }
+  }
+
+
+  function showCheckResult(column, label, result) {
+    for (i = 0; i < result.eachs.length; i++) {
+      result.eachs[i] ? $('#sheet div[data-x="' + column + '"][data-y="' + i + '"]').css('color', '') : $(
+        '#sheet div[data-x="' + column + '"][data-y="' + i + '"]').css('color', 'red');
+    }
+
+    if (result.status == 'fail') {
+      $('#sheet_check_result').text($('#sheet_check_result').text() + label + ' | ');
+    } else {
+      $('#sheet_check_count').text($('#sheet_check_count').text() * 1 - 1)
+    };
+
+    if ($('#sheet_check_count').text() == 0) {
+      batchUploadExe();
+      $('#sheet_check_count').text('');
+      $('#sheet_check_result').text('updating...');
+    }
+    return;
+  }
+
+  function batchUploadExe() {
+    // get #sheet data  this is  a repeat !
+    var raw_datas = [];
+    var row = [];
+    $('#sheet .sheet_row').each(function (i, ele) {
+      row = [];
+      $(ele).find('.sheet_cell').each(function (j, cell) {
+        row.push($(cell).text());
+      });
+      raw_datas.push(row);
+    })
+
+    // slim datas to only have first column ;
+    var datas = [];
+    for (i in raw_datas) {
+      if (raw_datas[i][0] == '') {
+        break;
+      }
+      datas.push(raw_datas[i]);
+    }
+
+
+    var station = $('#sheet_station').val();
+    var fields = ['CUSTOMER', 'CS_ORDER', 'CS_REF1', 'CS_REF2', 'DEP_DATE', 'ETA_DATE', 'CS_MODE', 'SHIPPER',
+      'CONSIGNEE', 'CONSIGNEE_CONTACT', 'CONSIGNEE_TEL', 'ORI', 'ORI_ADD', 'DEST', 'DEST_ADD', 'PRODUCT',
+      'PRODUCT_TYPE', 'QUANTITY', 'PACKAGE', 'VOLUME', 'WEIGHT', 'CHARGABLE_VW', 'VALUE', 'CUSTOMER_REMARK', 'REMARK',
+      'OP_REMARK', 'VENDOR_MODE', 'ACC_MON', 'R_LTL_RATE', 'R_ALLIN', 'R_FTL', 'R_LTL', 'R_PICKUP', 'R_DELIVERY',
+      'R_OTH1', 'R_OTH2'
+    ];
+    var session_username = $('#session_username').text();
+    var datas_set = {
+      fields: fields,
+      datas: datas,
+      session_username: session_username,
+      station: station
+    }
+
+    $.post(
+      'batch_input_upload.php',
+      datas_set,      
+      function (data, status) {
+        if (status = 'success') {    
+          console.log(data);
+          message('上传成功，首订单 ID号' + data);
+          //buildEmptySheet();
+          $('.sheet_cell').on('paste', handlePaste);
+          $('#sheet_check_count').text('');
+          $('#sheet_check_result').text('');
+        } else {
+          alert(status)
+        };
+      }
+    )
+  };
+
+
+  // validate scripts //
+  function isDateOrEmpty(datas, column, label, callback) {
+    reg = new RegExp(/[12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])/);
+    var eachs = [];
+    var status = 'pass';
+    for (i in datas) {
+      if (datas[i] == '') {
+        eachs.push(true);
+      } else {
+        eachs.push(reg.test(datas[i]));
+        if (!reg.test(datas[i])) {
+          status = 'fail'
+        }
+      }
+    }
+
+    callback(column, label, {
+      status: status,
+      eachs: eachs
+    })
+  }
+
+  function isNumber(datas, column, label, callback) {
+    var eachs = [];
+    var status = 'pass';
+    for (i in datas) {
+      eachs.push($.isNumeric(datas[i]));
+      if (!$.isNumeric(datas[i])) {
+        status = 'fail'
+      }
+    }
+
+    callback(column, label, {
+      status: status,
+      eachs: eachs
+    })
+  }
+
+  function isCustomer(datas, column, label) {
+    $.get('customer_list.php',
+      function (customer_string, status) {
+        var customers = [];
+        customerss = JSON.parse(customer_string);
+        for (i in customerss) {
+          customers.push(customerss[i][0]);
+        }
+
+        var eachs = [];
+        var status = 'pass';
+
+        for (i in datas) {
+          eachs.push(customers.indexOf(datas[i]) >= 0 ? true : false);
+          if (customers.indexOf(datas[i]) < 0) {
+            status = 'fail'
+          }
+        }
+
+        var result = {
+          status: status,
+          eachs: eachs
+        }
+        showCheckResult(column, label, result)
+      }
+    )
+  }
+
+  function isOption(datas, column, label, options, callback) {
+    var eachs = [];
+    var status = 'pass';
+    for (i in datas) {
+      eachs.push(options.indexOf(datas[i]) >= 0 ? true : false);
+      if (options.indexOf(datas[i]) < 0) {
+        status = 'fail'
+      }
+    }
+
+    callback(column, label, {
+      status: status,
+      eachs: eachs
+    })
+  }
+
+  function isLocation(datas, column, label) {
+    $.get('location_list.php',
+      function (location_string, status) {
+        var locations = [];
+        var locationss = JSON.parse(location_string);
+        for (i in locationss) {
+          locations.push(locationss[i][0]);
+        }
+
+        var eachs = [];
+        var status = 'pass';
+
+        for (i in datas) {
+          eachs.push(locations.indexOf(datas[i]) >= 0 ? true : false);
+          if (locations.indexOf(datas[i]) < 0) {
+            status = 'fail'
+          }
+        }
+
+        var result = {
+          status: status,
+          eachs: eachs
+        }
+
+        showCheckResult(column, label, result)
+      }
+    )
+  }
+
+  function isAccmon(datas, column, label, callback) {
+    var eachs = [];
+    var status = 'pass';
+    var reg = new RegExp(/[2][0]\d{2}-(0[1-9]|1[0-2])$/);
+
+    var min_year = new Date().getFullYear();
+    var max_year = min_year +1;
+    var min_mon = new Date().getMonth()+1;
+    if (min_mon<10){min_mon ='0'+min_mon;}
+    var max_mon = new Date().getMonth()+2;
+    if (max_mon<10){max_mon ='0'+max_mon;};
+
+    var acc_mon1 = min_year +'-'+min_mon;
+    var acc_mon2 = min_year + '-' + max_mon;
+    if(max_mon ==13){acc_mon2 = max_year + '01'};
+
+    for (i in datas) {
+      if(datas[i] != acc_mon1 && datas[i] != acc_mon2){
+        eachs.push(false);
+        status = 'fail';
+      }else{
+        eachs.push(true)
+      }
+      // eachs.push(reg.test(datas[i]));
+      // if (!reg.test(datas[i])) {
+      //   status = 'fail'
+      // }
+    }
+
+    callback(column, label, {
+      status: status,
+      eachs: eachs
+    })
+  }
+</script>

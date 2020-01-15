@@ -1,0 +1,77 @@
+<div class='card col-md-8' style='padding:0;'>
+  <div class='card-header'>
+    <h5 class='w-100'><span class='badge badge-info'>用户</span><span id='user-title' class='float-right'>新增用户</span></h5>
+  </div>
+  <div class='card-body'>
+    <form id='user_form' onsubmit='saveUserData(this); return false;' autocomplete="off">
+      <div class='form-group form-inline d-none'>
+        <label class='col-md-2 d-inline text-right'>ID</label>
+        <input class='col-md-10 form-control' name='ID' type='number' readonly>
+      </div>
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;' readonly required>用户名:</label>
+        <input class='col-md-10 form-control' name='USERNAME' type='text' autocomplete="off">
+      </div>
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>密码:</label>
+        <input class='col-md-10 form-control' name='PASSWORD' type='password' autocomplete="off">
+      </div>
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>电邮:</label>
+        <input class='col-md-10 form-control' name='EMAIL' mutiple type='email'>
+      </div>
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>角色:</label>
+        <select class='col-md-10 form-control' name='ROLE' type='text'>
+          <option disabled selected>请选择</option>
+          <option value='user'>user</option>
+          <option value='user_cost'>user_cost</option>
+          <option value='user_rev'>user_rev</option>
+          <option value='admin'>admin</option>
+        </select>
+      </div>
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>范围:</label>
+        <input class='col-md-10 form-control' name='SCOPE' type='text'>
+      </div>
+      <div class='form-group form-inline d-none'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>注册时间:</label>
+        <input class='col-md-10 form-control' name='CDT' type='datetime' readonly>
+      </div>
+      <div class='form-group form-inline d-none'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>更新时间:</label>
+        <input class='col-md-10 form-control' name='UDT' type='datetime' readonly>
+      </div>
+      <div class='w-100'></div>
+      <div class='row'>
+        <div class='col-md-2'></div>
+        <div class='col-md-10'><input type='submit' class='btn btn-primary float-right' value='确认'></div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  // initial inline function //
+  $(function(){
+    $('input').change(function(){
+      this.value = $.trim(this.value);
+    })
+  });
+
+  
+  function saveUserData(ele) {
+    data = $(ele).serializeArray();
+    $.post('user_save_data.php?',
+      data,
+      function(data, status) {
+        if (data.indexOf('Duplicate entry') > 0) {
+          alert('同名用户！')
+        } else {
+          loadUser();
+        };
+      })
+  }
+
+</script>

@@ -1,0 +1,59 @@
+<div class='w-100 d-flex' style="height:100%">
+  <!-- left side suspended 
+  <div class='h-100 d-inline w-100' style='border-right:1px solid var(--silver1)'>
+    <div class='h-100 d-flex flex-column' id='left-window'>
+      <div class='input-group'>
+        <div class='input-group-prepend border-secondary'>
+          <span class="input-group-text"><i class='material-icons md-18'>search</i></span>
+        </div>
+        <input class='form-control' name='search_shipper' onchange="loadShipment();" placeholder='客户名' />
+      </div>
+      <div class='' id='left-window-shipmentlist' style="overflow:scroll; flex-grow:1 "></div>
+    </div>
+  </div>
+-->
+  <!-- right side-->
+  <div class='w-100 justify-content-center' id='right-window' style="height:100%"></div>
+</div>
+
+<script>
+  $(function () {
+    loadShipment();
+    var random = Math.random() * 1000;
+    $('#right-window').load('shipment_form.html?v=' + random);
+  })
+
+  // load shipment list //
+  function loadShipment() {
+    var search_shipper = $('[name="search_shipper"]').val();
+    if (!search_shipper) {
+      $.get('shipment_load_data.php', displayShipmentlist);
+    } else {
+      $.get('shipment_load_data.php?shipper=' + search_shipper, displayShipmentlist);
+    }
+  }
+
+  function displayShipmentlist(data, status) {
+    datas = JSON.parse(data);
+    var ul = $('<ul class="list-group list-group-flush">')
+    for (i in datas) {
+      var li = $('<li class="list-group-item">').html(
+        datas[i]['CUSTOMER'] + ' ' +
+        '<span class="small">' + datas[i]['ID'] + '</span><br> ' +
+        '<span class="small">' + datas[i]['CS_ORDER'] + '</span> <br>' +
+        '<span class="small">' + datas[i]['ORI'] + ' ' +
+        datas[i]['DEST'] + '</span> <br> ' +
+        datas[i]['DEP_DATE']
+      ).data('ID', JSON.stringify(datas[i]['ID'])).addClass('hover');
+      li.on('click', function () {
+        var id = $(this).data('ID');
+        getShipmentRecord(id)
+      })
+      if (datas[i]['LOCKED'] == 1) {
+        li.prepend('&#128274;')
+      }
+      ul.append(li);
+    }
+    $('#left-window-shipmentlist').empty().append(ul);
+  }
+</script>

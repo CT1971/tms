@@ -1,0 +1,105 @@
+<div class='col-md-10 h-100'>
+  <div class='card' style='padding:0;'>
+    <div class='card-header'>
+      <h5 class='w-100'><span class='badge badge-info'>发货人</span><span id='shipper-title' class='float-right'>新增发货人</span></h5>
+    </div>
+    <div class='card-body h-100'>
+      <form class='' id='shipper_form' onsubmit='saveShipperData(this); return false;' autocomplete="off">
+        <div class='form-group form-inline d-none'>
+          <label class='col-md-3 d-inline text-right'>ID</label>
+          <input class='col-md-9 form-control' name='ID' type='number' readonly>
+        </div>
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>发货人简名:</label>
+          <input class='col-md-9 form-control' name='SHORT_NAME' type='text' autocomplete="off" required>
+        </div>
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>发货人全称:</label>
+          <input class='col-md-9 d-inline form-control' name='FULL_NAME' type='text' autocomplete="off" required>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>常用始发地:</label>
+          <input class='col-md-9 form-control' name='DEFAULT_ORI' type='text' list='location_list' required>
+        </div>
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>常用提货地址:</label>
+          <input class='col-md-9 form-control' name='DEFAULT_ADD' type='text' required>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>联系人:</label>
+          <input class='col-md-9 form-control' name='CONTACT' type='text' required>
+        </div>
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>移动电话:</label>
+          <input class='col-md-9 form-control' name='MOBILE' type='tel' required>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>固定电话:</label>
+          <input class='col-md-9 form-control' name='TEL' type='tel'>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>传真:</label>
+          <input class='col-md-9 form-control' name='FAX' type='tel'>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>电邮:</label>
+          <input class='col-md-9 form-control' name='EMAIL' type='email' multiple required>
+        </div>
+
+        <div class='form-group form-inline d-none'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>录入:</label>
+          <input class='col-md-9 form-control' name='ENTER_BY' type='text' readonly>
+        </div>
+
+
+        <div class='form-group form-inline d-none'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>注册时间:</label>
+          <input class='col-md-9 form-control' name='CDT' type='datetime' readonly>
+        </div>
+        <div class='form-group form-inline d-none'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>更新时间:</label>
+          <input class='col-md-9 form-control' name='UDT' type='datetime' readonly>
+        </div>
+        <div class='w-100'></div>
+        <div class='row'>
+          <div class='col-md-3'></div>
+          <div class='col-md-9'><input type='submit' class='btn btn-primary float-right' value='确认'></div>
+        </div>
+
+      </form>
+    </div>
+
+
+  </div>
+</div>
+<script>
+  // inline editing //
+  $(function(){
+    $('input').change(function(){
+      this.value = $.trim(this.value);
+    })
+  });
+
+
+  function saveShipperData(ele) {
+    $('#shipper_form [name="ENTER_BY"]').val(sessionStorage.getItem('session_username'))
+    data = $(ele).serializeArray();
+
+    $.post('shipper_save_data.php',
+      data,
+      function(data, status) {
+        if (data.indexOf('Duplicate entry') > 0) {
+          alert('发货人简名已存在！')
+        } else {
+          loadShipper();
+        };
+        //console.log(data);
+      })
+  }
+
+</script>

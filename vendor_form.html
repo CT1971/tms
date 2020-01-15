@@ -1,0 +1,150 @@
+<div class='col-md-10 h-100'>
+  <div class='card h-100' style='padding:0;'>
+    <div class='card-header'>
+      <h5 class='w-100'><span class='badge badge-info'>供应商</span><span id='vendor-title' class='float-right'>新增供应商</span></h5>
+    </div>
+    <div class='card-body h-100' style=''>
+      <form class='h-100' style='overflow:scroll;' id='vendor_form' onsubmit='saveVendorData(this); return false;' autocomplete="off">
+        <div class='form-group form-inline d-none'>
+          <label class='col-md-3 d-inline text-right'>ID</label>
+          <input class='col-md-9 form-control' name='ID' type='number' readonly>
+        </div>
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>供应商简名:</label>
+          <input class='col-md-9 form-control' name='SHORT_NAME' type='text' autocomplete="off" required>
+        </div>
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>服务站点</label>
+          <input class='col-md-6 form-control' name='SCOPE' type='text' autocomplete="off" required>
+          <select class='col-md-3 form-control' name='VALID'>
+            <option value='1' selected>有效</option>
+            <option value='0'>失效</option>
+          </select>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>供应商全称:</label>
+          <input class='col-md-9 d-inline form-control' name='FULL_NAME' type='text' autocomplete="off" required>
+        </div>
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>组织机构代码:</label>
+          <input class='col-md-9 d-inline form-control' name='ORG_ID' type='text'>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>所在地:</label>
+          <input class='col-md-9 form-control' name='LOCATION' type='text' list='location_list' required>
+        </div>
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>详细地址:</label>
+          <input class='col-md-9 form-control' name='ADDRESS' type='text'>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>联系人:</label>
+          <input class='col-md-9 form-control' name='CONTACT' type='text' required>
+        </div>
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>移动电话:</label>
+          <input class='col-md-9 form-control' name='MOBILE' type='tel' required>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>固定电话:</label>
+          <input class='col-md-9 form-control' name='TEL' type='tel'>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>传真:</label>
+          <input class='col-md-9 form-control' name='FAX' type='tel'>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>电邮:</label>
+          <input class='col-md-9 form-control' name='EMAIL' type='email' multiple required>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>网址:</label>
+          <input class='col-md-9 form-control' name='URL' type='url'>
+        </div>
+
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>发票抬头:</label>
+          <input class='col-md-9 form-control' name='PAY_TO' type='text'>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>发票地址:</label>
+          <input class='col-md-9 form-control' name='PAY_ADD' type='text'>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>增值税号:</label>
+          <input class='col-md-9 form-control' name='VAT_NO' type='text'>
+        </div>
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>付款银行:</label>
+          <input class='col-md-9 form-control' name='BANK' type='text'>
+        </div>
+
+
+        <div class='form-group form-inline'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>银行账号:</label>
+          <input class='col-md-9 form-control' name='BANK_ACCOUNT' type='text'>
+        </div>
+
+        <div class='form-group form-inline d-none'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>录入:</label>
+          <input class='col-md-9 form-control' name='ENTER_BY' type='text' readonly>
+        </div>
+
+
+        <div class='form-group form-inline d-none'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>注册时间:</label>
+          <input class='col-md-9 form-control' name='CDT' type='datetime' readonly>
+        </div>
+        <div class='form-group form-inline d-none'>
+          <label class='col-md-3 d-inline text-right' style='text-align:left;'>更新时间:</label>
+          <input class='col-md-9 form-control' name='UDT' type='datetime' readonly>
+        </div>
+        <div class='w-100'></div>
+        <div class='row'>
+          <div class='col-md-3'></div>
+          <div class='col-md-9'><input type='submit' class='btn btn-primary float-right' value='确认'></div>
+        </div>
+
+      </form>
+    </div>
+
+
+  </div>
+</div>
+<script>
+  // inline editing //
+  $(function() {
+    $('input').change(function() {
+      this.value = $.trim(this.value);
+    })
+  });
+
+
+  function saveVendorData(ele) {
+    $('#vendor_form [name="ENTER_BY"]').val(sessionStorage.getItem('session_username'))
+    data = $(ele).serializeArray();
+
+    $.post('vendor_save_data.php',
+      data,
+      function(data, status) {
+        if (data.indexOf('Duplicate entry') > 0) {
+          alert('供应商简名已存在！')
+        } else {
+          loadVendor();
+        };
+        //console.log(data);
+      })
+  }
+
+</script>

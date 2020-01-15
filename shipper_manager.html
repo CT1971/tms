@@ -1,0 +1,73 @@
+<div class='container-fluid h-100 p-0 m-0'>
+  <div class='row h-100'>
+    <div class='col col-md-3 d-flex flex-column h-100' id='left-window'>
+      <div class='btn-group border-silver' style='display:flex;'>
+        <button class='btn btn-light' type='button' style='flex:1' onclick='addShipper()'>+</button>
+
+        <div class='dropdown' style='flex:1'>
+          <button class='btn btn-light w-100' data-toggle='dropdown' type='button'> &#128269;</button>
+          <form class='dropdown-menu p-0 border-info' onsubmit='loadShipper(); return false;'>
+            <input class='dropdown-item form-control' name='search_shipper' />
+            <input class='d-none' type='submit' />
+          </form>
+        </div>
+
+      </div>
+      <div id='left-window-shipperlist' class='flex-grow-1' style="overflow:scroll; "></div>
+    </div>
+    <div id='right-window' class='col col-md-9 h-100'></div>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    loadShipper();
+    $('#right-window').load('shipper_form.html?v=5');
+  })
+
+  // load Shipper list //
+  function loadShipper() {
+    var search_shipper = $('[name="search_shipper"]').val();
+    //console.log(search_shipper);
+    if (!search_shipper) {
+      $.get('shipper_load_data.php', displayShipperlist);
+    } else {
+      $.get('shipper_load_data.php?shipper=' + search_shipper, displayShipperlist);
+    }
+  }
+
+  function displayShipperlist(data, status) {
+    datas = JSON.parse(data);
+    var ul = $('<ul class="list-group">')
+    for (i in datas) {
+      var li = $('<li class="list-group-item">').text(datas[i]['SHORT_NAME']).data('shipper_record', JSON.stringify(datas[i])).addClass('hover');
+      li.on('click', function() {
+        showShipperCard(this)
+      })
+      ul.append(li);
+    }
+    $('#left-window-shipperlist').empty().append(ul);
+  }
+
+
+  // show user record 
+  function showShipperCard(ele) {
+    var string = $(ele).data('shipper_record');
+    var data = JSON.parse(string);
+    var fields = Object.keys(data);
+    var card = $('#shipper_form');
+    $('#shipper-title').text(data['SHORT_NAME']);
+    for (i in fields) {
+      card.find('[name="' + fields[i] + '"]').val(data[fields[i]]);
+    }
+    card.find('[name="SHORT_NAME"]').attr('readonly', true);
+  }
+
+  //add user
+  function addShipper() {
+    $('#shipper-title').text('新增发货人');
+    $("#shipper_form").trigger("reset")
+    $('#shipper_form [name="SHORT_NAME"]').attr('readonly', false);    
+  }
+
+</script>

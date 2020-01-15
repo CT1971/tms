@@ -1,0 +1,74 @@
+<div class='container-fluid h-100 p-0 m-0'>
+  <div class='row h-100'>
+    <div class='col col-md-3 d-flex flex-column h-100' id='left-window'>
+      <div class='btn-group border-silver' style='display:flex;'>
+        <button class='btn btn-light' type='button' style='flex:1' onclick='addConsignee()'>+</button>
+
+        <div class='dropdown' style='flex:1'>
+          <button class='btn btn-light w-100' data-toggle='dropdown' type='button'> &#128269;</button>
+          <form class='dropdown-menu p-0 border-info' onsubmit='loadConsignee(); return false;'>
+            <input class='dropdown-item form-control' name='search_consignee' />
+            <input class='d-none' type='submit' />
+          </form>
+        </div>
+
+      </div>
+      <div id='left-window-consigneelist' class='flex-grow-1' style="overflow:scroll; "></div>
+    </div>
+    <div id='right-window' class='col col-md-9 h-100'></div>
+  </div>
+</div>
+
+<script>
+  $(function () {
+    loadConsignee();
+    rand = Math.random()*1000;
+    $('#right-window').load('consignee_form.html?v='+rand);
+  })
+
+  // load Consignee list //
+  function loadConsignee() {
+    var search_consignee = $('[name="search_consignee"]').val();
+    //console.log(search_consignee);
+    if (!search_consignee) {
+      $.get('consignee_load_data.php', displayConsigneelist);
+    } else {
+      $.get('consignee_load_data.php?consignee=' + search_consignee, displayConsigneelist);
+    }
+  }
+
+  function displayConsigneelist(data, status) {
+    datas = JSON.parse(data);
+    var ul = $('<ul class="list-group">')
+    for (i in datas) {
+      var li = $('<li class="list-group-item">').text(datas[i]['SHORT_NAME']).data('consignee_record', JSON.stringify(
+        datas[i])).addClass('hover');
+      li.on('click', function () {
+        showConsigneeCard(this)
+      })
+      ul.append(li);
+    }
+    $('#left-window-consigneelist').empty().append(ul);
+  }
+
+
+  // show user record 
+  function showConsigneeCard(ele) {
+    var string = $(ele).data('consignee_record');
+    var data = JSON.parse(string);
+    var fields = Object.keys(data);
+    var card = $('#consignee_form');
+    $('#consignee-title').text(data['SHORT_NAME']);
+    for (i in fields) {
+      card.find('[name="' + fields[i] + '"]').val(data[fields[i]]);
+    }
+    card.find('[name="SHORT_NAME"]').attr('readonly', true);
+  }
+
+  //add user
+  function addConsignee() {
+    $('#consignee-title').text('新增收货人');
+    $("#consignee_form").trigger("reset")
+    $('#consignee_form [name="SHORT_NAME"]').attr('readonly', false);
+  }
+</script>

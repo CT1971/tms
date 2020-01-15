@@ -1,0 +1,115 @@
+<div id='update_string' class='d-none'>[]</div> <!-- userEntry-->
+<div id='window_search_main' class='d-flex flex-grow-1 ' style='overflow:scroll;'>
+  <i class="material-icons">directions_run</i>
+</div>
+<div id='window_search_status' class='d-none fixed-bottom bg-secondary text-white'></div>
+
+<script>
+  $(function() {
+    getSearchShipments();
+  })
+
+  function getSearchShipments() {
+    var where = $('#search_where').text();
+    var selected_field = $('#search_selected_fields').text();
+    var order_by = $('#search_order_by').text();
+    $.get(
+      'search_load_data.php' +
+      '?where=' + encodeURIComponent(where) +
+      '&selected_field=' + encodeURIComponent(selected_field),
+      '&order_by=' + encodeURIComponent(order_by),
+      displaySearchResult
+    )
+  }
+
+  function displaySearchResult(data, status) {
+    var data_set = JSON.parse(data);
+    var no_of_rows = data_set['rows'];
+    var datas = data_set['datas'];
+    var msg = data_set['msg'];
+
+    // quit if data is too much > 1000 //
+    if (msg != 'success') {
+      message(msg);
+      return;
+    }
+
+    $('#window_search_status').text('记录数:' + no_of_rows);
+
+    $update_list = searchUpdateList(datas);
+
+    $('#window_search_main').empty().append($update_list);
+    $('#window_search_main input[type="date"]').attr({
+      'min': '2010-01-19',
+      'max': '2030-01-18'
+    })
+    $('[data-toggle="tooltip"]').tooltip();
+  }
+
+  function searchUpdateList(datas) { // old trackUpdateListView
+
+    var labels_view = $('#search_view_labels').text().split(',');
+    var labels_edit = $('#search_edit_labels').text().split(',');
+    var fields_view = $('#search_view_fields').text().split(',');
+    var fields_edit = JSON.parse($('#search_edit_fields').text());
+    $table = $('<table class="table table-sm " style="" >');
+
+    $thead = $('<thead>');
+    $table.append($thead);
+
+    $tr = $('<tr>');
+    $thead.append($tr);
+
+    for (i in labels_view) {
+      $td = $('<th class="text-nowrap bg-secondary" style="position:sticky; top:0; font-weight:300; color:white;">').text(labels_view[i]);
+      $tr.append($td);
+    }
+    for (i in labels_edit) {
+      $td = $('<th class="text-nowrap bg-secondary" style="position:sticky; top:0; font-weight:300; color:white;">').text(labels_edit[i]);
+      $tr.append($td);
+    }
+
+    $tbody = $('<tbody>');
+    $table.append($tbody);
+
+    for (i in datas) {
+      $tr = $('<tr ondblclick="showRecord($(this));">');
+      $tr.data('ID', datas[i]["ID"]);
+      for (j in fields_view) {
+        $td = $('<td class="text-nowrap text-secondary align-middle" style="max-width:150px; overflow:hidden;" >').text(datas[i][fields_view[j]]);
+        $tr.append($td);
+      }
+
+      for (j in fields_edit) {
+        var label = fields_edit[j]['label'];
+        var field = fields_edit[j]['field'];
+        var ele_type = fields_edit[j]['ele_type'];
+        var type = fields_edit[j]['type'];
+        var data_list = fields_edit[j]['data_list'];
+        var options = fields_edit[j]['options'];
+        var width = fields_edit[j]['width'];
+        var field_class = fields_edit[j]['field_class'];
+
+        $td = $('<td class="text-nowrap text-secondary align-middle" style="max-width:150px; overflow:hidden;">');
+        $span = $('<span>').text(datas[i][field]);
+        $span.addClass(field_class);
+
+        $td.append($span);
+        $tr.append($td);
+      }
+      $tbody.append($tr);
+    }
+
+    return $table;
+  }
+
+
+  function showRecord(ele) {
+    addShipment() // reset the form ;
+    //    console.log('reset');
+    $('#search_shipment_form_container').slideDown("fast");
+    var id = ele.data('ID');
+    getShipmentRecord(id);
+  }
+
+</script>

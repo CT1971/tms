@@ -1,0 +1,72 @@
+<div class='container-fluid h-100 p-0 m-0'>
+  <div class='row h-100'>
+    <div class='col col-md-3 d-flex flex-column h-100' id='left-window'>
+      <div class='btn-group border-silver' style='display:flex;'>
+        <button class='btn btn-light' type='button' style='flex:1' onclick='addUser()'>+</button>
+
+        <div class='dropdown' style='flex:1'>
+          <button class='btn btn-light w-100' data-toggle='dropdown' type='button'> &#128269;</button>
+          <form class='dropdown-menu p-0 border-info' onsubmit='loadUser(); return false;'>
+            <input class='dropdown-item form-control' name='search_user' />
+            <input class='d-none' type='submit' />
+          </form>
+        </div>
+
+      </div>
+      <div class='flex-grow-1' id='left-window-userlist' style="overflow:scroll;"></div>
+    </div>
+    <div id='right-window' class='col-md-9'></div>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    loadUser();
+    $('#right-window').load('user_form.html?v=1');
+  })
+
+  // load user list //
+  function loadUser() {
+    var search_user = $('[name="search_user"]').val();
+    if (!search_user) {
+      $.get('user_load_data.php', displayUserlist);
+    } else {
+      $.get('user_load_data.php?user=' + search_user, displayUserlist);
+    }
+  }
+
+  function displayUserlist(data, status) {
+    datas = JSON.parse(data);
+    var ul = $('<ul class="list-group">')
+    for (i in datas) {
+      var li = $('<li class="list-group-item">').text(datas[i]['USERNAME']).data('user_record', JSON.stringify(datas[i])).addClass('hover');
+      li.on('click', function() {
+        showUserCard(this)
+      })
+      ul.append(li);
+    }
+    $('#left-window-userlist').empty().append(ul);
+  }
+
+
+  // show user record 
+  function showUserCard(ele) {
+    var string = $(ele).data('user_record');
+    var data = JSON.parse(string);
+    var fields = Object.keys(data);
+    var card = $('#user_form');
+    $('#user-title').text(data['USERNAME']);
+    for (i in fields) {
+      card.find('[name="' + fields[i] + '"]').val(data[fields[i]]);
+    }
+    card.find('[name="USERNAME"]').attr('readonly', true);
+  }
+
+  //add user
+  function addUser() {
+    $('#user-title').text('新增用户');
+    $("#user_form").trigger("reset")
+    $("#user_form").find('[name="USERNAME"]').attr('readonly', false);
+  }
+
+</script>

@@ -1,0 +1,67 @@
+<div spellcheck="false" 
+    style="height:80vh; width:80vw; position:fixed; top:10vh; left:10vw; background:black; color:white; z-index:100; border:10px solid black; border-radius:4px;">
+    <div id='command_input' contenteditable="true"
+        style="height:15vh; width:100%; box-sizing: border-box; border-bottom:1px solid white; outline:none; color:silver; overflow:scroll;">
+    </div>
+    <div style="height:5vh;">
+        <button style="border:none; background:black; color:orangered; outline:none; padding:5px;" onclick='cmdRun()'>run</button>
+        <button style="border:none; background:black; color:orangered; outline:none; padding:5px;" onclick='cmdClear()'>clear</button>
+        <button style="border:none; background:black; color:orangered; outline:none; padding:5px;" onclick='cmdExit()'>exit</button>
+    </div>
+    <div id='command_output' style="height:60vh; color:white; position:relative; overflow:scroll;"></div>
+
+</div>
+
+<script>
+    function cmdClear() {
+        $('#command_input').empty();
+    }
+    
+    function cmdExit() {
+        $('#command_window').remove();
+    }
+
+    function cmdRun() {
+        $('#command_output').empty()
+        $('#command_output').text('processing...');
+        var command = $('#command_input').text();
+
+        $.post(
+            'command.php', {
+                command: command
+            },
+            cmdBuild
+        )
+    }
+
+    function cmdBuild(data, status) {
+        $('#command_output').empty();
+        var data_set = JSON.parse(data);
+        var q_status = data_set['q_status'];
+        if (q_status != 'success') {
+            $('#command_output').append(q_status);
+            return;
+        } else {
+            var datas = data_set['datas'];
+            var keys = Object.keys(datas[0]);
+            var tb = $('<table>');
+
+            var tr_head = $('<tr>');
+            for (i in keys) {
+                th = $('<th style="position:sticky; top:0; background:black; padding:3px;">').text(keys[i]);
+                tr_head.append(th);
+            }
+            tb.append(tr_head);
+
+            for (i in datas) {
+                var tr = $('<tr>');
+                for (j in keys) {
+                    td = $('<td style="padding:3px;">').text(datas[i][keys[j]]);
+                    tr.append(td);
+                }
+                tb.append(tr);
+            }
+            $('#command_output').append(tb);
+        }
+    }
+</script>

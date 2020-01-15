@@ -1,0 +1,370 @@
+<!-- variables -->
+<div class='d-none'>
+  where: <div id='report_where'></div>
+  <!-- default for preset -->
+  report_sql_select:<div id='report_sql_select'></div>
+  report_sql_group_by:<div id='report_sql_group_by'></div>
+  report_order_by:<div id='report_sql_order_by'></div>
+</div>
+<div class='d-flex flex-column w-100'>
+  <div id='report_menu' class='p-1 border-bottom'>
+    <!-- report input -->
+    <div class='d-flex justify-content-between'>
+      <div class='d-flex'>
+        <form id='report_form' class='form-inline'>
+          <!-- condition 1 ~ 5 -->
+          <div class='mr-1 sm'>条件:</div>
+          <div class='form-group border mr-1'>
+            <select name='report_field' class='form-control form-control-sm'
+              style='border:none; padding:0; border-radius:0; text-align-last:center; '></select>
+            <select name='report_cond' class='form-control form-control-sm'
+              style='border:none;  text-align:center; padding:3px; margin:0;text-align-last:center;background:rgb(245,245,250); '></select>
+            <input name='report_value' class='form-control form-control-sm'
+              style='border:none; border-radius:0; width:90px;'>
+          </div>
+          <div class='form-group border mr-1'>
+            <select name='report_field' class='form-control form-control-sm'
+              style='border:none; padding:0; border-radius:0; text-align-last:center; '></select>
+            <select name='report_cond' class='form-control form-control-sm'
+              style='border:none;  text-align:center; padding:3px; margin:0;text-align-last:center;background:rgb(245,245,250); '></select>
+            <input name='report_value' class='form-control form-control-sm'
+              style='border:none; border-radius:0; width:90px;'>
+          </div>
+          <div class='form-group border mr-1'>
+            <select name='report_field' class='form-control form-control-sm'
+              style='border:none; padding:0; border-radius:0; text-align-last:center; '></select>
+            <select name='report_cond' class='form-control form-control-sm'
+              style='border:none;  text-align:center; padding:3px; margin:0;text-align-last:center;background:rgb(245,245,250); '></select>
+            <input name='report_value' class='form-control form-control-sm'
+              style='border:none; border-radius:0; width:90px;'>
+          </div>
+          <div class='form-group border mr-1'>
+            <select name='report_field' class='form-control form-control-sm'
+              style='border:none; padding:0; border-radius:0; text-align-last:center; '></select>
+            <select name='report_cond' class='form-control form-control-sm'
+              style='border:none;  text-align:center; padding:3px; margin:0;text-align-last:center;background:rgb(245,245,250); '></select>
+            <input name='report_value' class='form-control form-control-sm'
+              style='border:none; border-radius:0; width:90px;'>
+          </div>
+          <div class='form-group border mr-3'>
+            <select name='report_field' class='form-control form-control-sm'
+              style='border:none; padding:0; border-radius:0; text-align-last:center; '></select>
+            <select name='report_cond' class='form-control form-control-sm'
+              style='border:none;  text-align:center; padding:3px; margin:0;text-align-last:center;background:rgb(245,245,250); '></select>
+            <input name='report_value' class='form-control form-control-sm'
+              style='border:none; border-radius:0; width:90px;'>
+          </div>
+
+          <!-- order -->
+
+          <div class='mr-1 sm'>排序:</div>
+          <select name='report_order_by' class='form-control form-control-sm' style='text-align-last:center;'></select>
+
+          <select name='report_order_by' class='form-control form-control-sm' style='text-align-last:center;'></select>
+
+          <select name='report_order_by' class='form-control form-control-sm mr-3'
+            style='text-align-last:center;'></select>
+
+          <div class='mr-1 sm'>报告:</div>
+          <select name='report_preset' class='form-control form-control-sm' style='text-align-last:center;'
+            onchange='reportAdjustPreset();'>
+          </select>
+
+        </form>
+      </div>
+      <div class='d-flex justify-content-end'>
+        <div class='align-self-center'>
+          <i class="material-icons md-24 mr-3" onclick='buildReport()'>cloud_download</i>
+          <i class="material-icons md-24" onclick='copyReport()'>file_copy</i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- result display window -->
+  <div class='d-flex flex-grow-1' id='report_content' style='overflow:scroll; '></div>
+</div>
+
+<script>
+  $(function () {
+    buildQueryOptions();
+    // put in all preset 报告 and trigger a change value to select default 报告
+    var presets = presetsVariable();
+    var keys = Object.keys(presets);
+    $('select[name="report_preset"]').empty();
+    $('select[name="report_preset"]').append($('<option selected disabled>').text('选择'))
+    for (i in keys) {
+      // check report whilte list //
+      var user_role = $('#session_role').text();
+      var role_whitelist = presets[keys[i]]['role_whitelist']
+      if (role_whitelist.indexOf(user_role) >= 0) {
+        $('select[name="report_preset"]').append($('<option>').html(keys[i]));
+      }
+    }
+    $('select[name="report_preset"]').val('基本业务量').trigger('change');
+  })
+
+
+  function buildQueryOptions() {
+    var field_options = [{
+        text: '',
+        value: ''
+      },
+      {
+        text: 'ID',
+        value: 'ID'
+      },
+      {
+        text: '站点',
+        value: 'STATION'
+      },
+      {
+        text: '财务月度',
+        value: 'ACC_MON'
+      },
+      {
+        text: '客户',
+        value: 'CUSTOMER'
+      },
+      {
+        text: '订单号',
+        value: 'CS_ORDER'
+      },
+      {
+        text: '发货人',
+        value: 'SHIPPER'
+      },
+      {
+        text: '收货人',
+        value: 'CONSIGNEE'
+      },
+      {
+        text: '产品名称',
+        value: 'PRODUCT'
+      },
+      {
+        text: '货值',
+        value: 'VALUE'
+      },
+      {
+        text: '始发地',
+        value: 'ORI'
+      },
+      {
+        text: '目的地',
+        value: 'DEST'
+      },
+      {
+        text: '短驳号',
+        value: 'PICKUP_JOBNO'
+      },
+      {
+        text: '供应商',
+        value: 'VENDOR'
+      },
+      {
+        text: '操作备注',
+        value: 'OP_REMARK'
+      },
+      {
+        text: '发车日期',
+        value: 'DEP_DATE'
+      },
+      {
+        text: '到达日期',
+        value: 'ARV_DATE'
+      },
+      {
+        text: '回单日期',
+        value: 'POD_DATE'
+      },
+      {
+        text: '成本',
+        value: 'TTL_COST'
+      },
+      {
+        text: '收入',
+        value: 'TTL_REV'
+      },
+      {
+        text: 'GP',
+        value: 'GP'
+      }
+    ]
+    var target_select_field = $('select[name="report_field"]');
+    var target_order_by = $('select[name="report_order_by"]')
+    for (i in field_options) {
+      target_select_field.append($('<option>').val(field_options[i]['value']).text(field_options[i]['text']));
+      target_order_by.append($('<option>').val(field_options[i]['value']).text(field_options[i]['text']));
+    }
+
+    var cond_options = [{
+      text: '',
+      value: ''
+    }, {
+      text: '=',
+      value: '='
+    }, {
+      text: '>',
+      value: '>'
+    }, {
+      text: '>=',
+      value: '>='
+    }, {
+      text: '<',
+      value: '<'
+    }, {
+      text: '<=',
+      value: '<='
+    }, {
+      text: '~',
+      value: '~'
+    }, {
+      text: '<>',
+      value: '<>'
+    }, {
+      text: 'null',
+      value: 'null'
+    }];
+    var target_cond = $('select[name="report_cond"]');
+    for (i in cond_options) {
+      target_cond.append($('<option>').val(cond_options[i]['value']).text(cond_options[i]['text']));
+    }
+    return;
+  }
+
+
+
+  function presetsVariable() {
+    var presets = {
+      基本业务量: {
+        sql_select: ' select ACC_MON, CUSTOMER, count(1) as 订单数, sum(WEIGHT) as 累计重量, sum(VOLUME) as 累计体积 from shipment ',
+        sql_group_by: ' group by ACC_MON, CUSTOMER',
+        role_whitelist: 'admin,user,user_rev,user_cost'
+      },
+      收入报告: {
+        sql_select: ' select ACC_MON as 财务月度, CUSTOMER as 客户, sum(TTL_REV) as 收入小计 from shipment ',
+        sql_group_by: ' group by ACC_MON, CUSTOMER',
+        role_whitelist: 'admin,user,user_rev,'
+      },
+      成本报告: {
+        sql_select: ' select ACC_MON as 财务月度, VENDOR as 供应商, sum(TTL_COST) as 成本小计 from shipment ',
+        sql_group_by: ' group by ACC_MON,VENDOR',
+        role_whitelist: 'admin,user,user_cost'
+      },
+      收入成本对照: {
+        sql_select: ' select ACC_MON as 财务月度, CUSTOMER as 客户, VENDOR as 供应商, sum(TTL_REV) as 收入小计, sum(TTL_COST) as 成本小计 from shipment ',
+        sql_group_by: ' group by ACC_MON, CUSTOMER, VENDOR',
+        role_whitelist: 'admin,user'
+      },
+      供应商账单: {
+        sql_select: ' select STATION as 站点, ACC_MON as 财务月度, VENDOR as 供应商, ID as 碧高ID, CS_ORDER as 订单号, CONSIGNEE as 收货人, ORI as 始发地, DEST as 目的地, DEST_ADD as 送货地址, PRODUCT as 产品名称, DEP_DATE as 发车日期, ARV_DATE as 到达日期, POD_DATE as 回单,VOLUME as 体积, format(VENDOR_VW,3) as 结算体重, C_ALLIN as 包干, C_FTL as 整车, C_LTL as 零担, C_PICKUP as 提货, C_DELIVERY as 送货, C_OTH1 as 其他1, C_OTH2 as 其他2, C_CLAIM as 赔款,TTL_COST as 应付小计,OP_REMARK as 操作备注 from shipment ',
+        sql_group_by: '',
+        role_whitelist: 'admin,user,user_cost'
+      },
+      回单状况: {
+        sql_select: ' select ID, STATION as 站点, ACC_MON as 财务月度, VENDOR as 供应商, ORI as 始发地, CS_ORDER as 订单号,CONSIGNEE as 收货人, CONSIGNEE_CONTACT as 联系人, DEST as 目的地, DEST_ADD as 送货地址, concat(QUANTITY,PACKAGE) as 数量,VENDOR_VW as 计费体重, DEP_DATE as 发车日期, ARV_DATE as 到达日期,  POD_DATE as 回单 from shipment ',
+        sql_group_by: '',
+        role_whitelist: 'admin,user,user_cost'
+      }
+
+    }
+    return presets;
+  }
+
+
+  function reportAdjustPreset() {
+    var preset = $('select[name="report_preset"] option:selected').val();
+    var presets = presetsVariable();
+    $('#report_sql_select').text(presets[preset]['sql_select']);
+    $('#report_sql_group_by').text(presets[preset]['sql_group_by']);
+  }
+
+
+  function buildReport() {
+    reportBuildQuery();
+    var rand = Math.round(Math.random() * 1000);
+    $('#report_content').load('report_report.html?v=' + rand); // #report_content main
+  }
+
+  function reportBuildQuery() {
+    var ele = $("#report_form")
+    var data = ele.serializeArray();
+    //console.log(data);
+
+    var report_fields = [];
+    var report_conds = [];
+    var report_values = [];
+    var report_order_bys = [];
+    var report_preset;
+    for (i in data) {
+      switch (data[i]['name']) {
+        case 'report_field':
+          report_fields.push(data[i]['value']);
+          break;
+        case 'report_cond':
+          report_conds.push(data[i]['value']);
+          break;
+        case 'report_value':
+          report_values.push(data[i]['value']);
+          break;
+        case 'report_order_by':
+          report_order_bys.push(data[i]['value']);
+          break;
+        case 'report_preset':
+          report_preset = data[i]['value'];
+          break;
+      }
+    }
+
+    // var where_string = $('#session_scope_where').text();
+    where_string = '';
+    for (i = 0; i < 5; i++) {
+      if (report_fields[i] != '' && report_conds[i] != '') {
+        if (report_conds[i] == '~') {
+          where_string += where_string.length > 0 ?
+            ' and ' + report_fields[i] + ' ' + 'like' + ' "%' + report_values[i] + '%" ' :
+            report_fields[i] + ' ' + 'like' + ' "%' + report_values[i] + '%" ';
+        } else if (report_conds[i] == 'null') {
+          where_string += where_string.length > 0 ?
+            ' and ' + report_fields[i] + ' is null ' :
+            report_fields[i] + ' is null ';
+        } else {
+          where_string += where_string.length > 0 ? ' and ' + report_fields[i] + ' ' + report_conds[i] + ' "' +
+            report_values[i] + '" ' :
+            report_fields[i] + ' ' + report_conds[i] + ' "' + report_values[i] + '" ';
+        }
+      }
+    }
+
+
+
+
+    var order_by_string = ' order by ';
+    for (i = 0; i < 3; i++) {
+      if (report_order_bys[i] == '') {
+        continue;
+      } else {
+        order_by_string += 'convert(' + report_order_bys[i] + ' using GB2312)' + ','
+      }
+    }
+    order_by_string += ' ID';
+
+    $('#report_where').text(where_string)
+    $('#report_sql_order_by').text(order_by_string)
+  }
+
+
+  function copyReport() {
+    var elm = document.getElementById("report_for_copy");
+    if (!elm) {
+      message('report not ready')
+    }
+    var selection = window.getSelection();
+    var range = document.createRange();
+    range.selectNodeContents(elm);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    document.execCommand("Copy");
+    alert("Copied div content to clipboard");
+  }
+</script>

@@ -1,0 +1,73 @@
+<div class='container-fluid h-100 p-0 m-0'>
+  <div class='row h-100'>
+    <div class='col col-md-3 d-flex flex-column h-100' id='left-window'>
+      <div class='btn-group border-silver' style='display:flex;'>
+        <button class='btn btn-light' type='button' style='flex:1' onclick='addVendor()'>+</button>
+
+        <div class='dropdown' style='flex:1'>
+          <button class='btn btn-light w-100' data-toggle='dropdown' type='button'> &#128269;</button>
+          <form class='dropdown-menu p-0 border-info' onsubmit='loadVendor(); return false;'>
+            <input class='dropdown-item form-control' name='search_vendor' />
+            <input class='d-none' type='submit' />
+          </form>
+        </div>
+
+      </div>
+      <div id='left-window-vendorlist' class='flex-grow-1' style="overflow:scroll; "></div>
+    </div>
+    <div id='right-window' class='col col-md-9 h-100'></div>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    loadVendor();
+    $('#right-window').load('vendor_form.html?v=6');
+  })
+
+  // load vendor list //
+  function loadVendor() {
+    var search_vendor = $('[name="search_vendor"]').val();
+    //console.log(search_vendor);
+    if (!search_vendor) {
+      $.get('vendor_load_data.php', displayVendorlist);
+    } else {
+      $.get('vendor_load_data.php?vendor=' + search_vendor, displayVendorlist);
+    }
+  }
+
+  function displayVendorlist(data, status) {
+    datas = JSON.parse(data);
+    var ul = $('<ul class="list-group">')
+    for (i in datas) {
+      var li = $('<li class="list-group-item">').text(datas[i]['SHORT_NAME']).data('vendor_record', JSON.stringify(datas[i])).addClass('hover');
+      li.on('click', function() {
+        showVendorCard(this)
+      })
+      ul.append(li);
+    }
+    $('#left-window-vendorlist').empty().append(ul);
+  }
+
+
+  // show user record 
+  function showVendorCard(ele) {
+    var string = $(ele).data('vendor_record');
+    var data = JSON.parse(string);
+    var fields = Object.keys(data);
+    var card = $('#vendor_form');
+    $('#vendor-title').text(data['SHORT_NAME']);
+    for (i in fields) {
+      card.find('[name="' + fields[i] + '"]').val(data[fields[i]]);
+    }
+    card.find('[name="SHORT_NAME"]').attr('readonly', true);
+  }
+
+  //add user
+  function addVendor() {
+    $('#vendor-title').text('新增供应商');
+    $("#vendor_form").trigger("reset")
+    $('#vendor_form [name="SHORT_NAME"]').attr('readonly', false);    
+  }
+
+</script>

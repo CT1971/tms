@@ -1,0 +1,721 @@
+<form id='shipment_form' data-change=''
+  style='margin:auto; height:100%; overflow:scroll; max-width:800px; background:rgb(230,230,230)' autocomplete='off'>
+  <div class='sticky-top p-1 bg-secondary' style='z-index:3; margin:10px; margin-top:0px; margin-bottom:0;'>
+    <div class='d-flex justify-content-between'>
+      <div class='d-flex border'>
+        <div class='form-inline'>
+          <select class='form-control text-white border-0 mr-4' name='STATION' style="background:none"
+            required></select>
+          <div class='form-group mr-3'>
+            <label class='text-white'>ID:</label>
+            <input class='form-control border-0 text-white' type='number' name='ID' value='0'
+              style='width:80px!important; background:none;' readonly>
+          </div>
+          <div class='form-group mr-3'>
+            <label class='text-light'>主单ID:</label>
+            <input class='form-control border-0 text-white' type='number' name='CONSOLE_ID'
+              style='width:80px!important; background:none;' readonly>
+          </div>
+          <div class='form-group'>
+            <label class='text-white'>财务月度:</label>
+            <select class='form-control border-0 text-white' name='ACC_MON' style="background:none;"></select>
+          </div>
+        </div>
+      </div>
+      <div class='d-flex justify-content-end align-items-center'>
+        <i class="material-icons text-white mr-2" onclick='saveShipmentData($("#shipment_form"))'>save</i>
+        <i class="material-icons text-white" onclick='addShipment()'>add</i>
+      </div>
+    </div>
+  </div>
+
+  <div class='mb-4' style='background:white; padding:10px; border-radius:5px; margin:10px;'>
+    <div class='form-row p-2'>
+      <div class='col-md-4 '>
+        <label class='sm m-0'>客户*</label>
+        <input type='text' name='CUSTOMER' class='form-control' list='customer_list' required>
+      </div>
+
+      <div class='col-md-3 '>
+        <label class='sm m-0'>下单日期*</label>
+        <input type='date' name='ORDER_DATE' class='form-control' min='2012-01-01' max='2030-12-31' required>
+      </div>
+
+      <div class='col-md-4 '>
+        <label class='sm m-0'>订单号*</label>
+        <input type='text' name='CS_ORDER' class='form-control' value='' required>
+      </div>
+
+      <div class='col-md-1 '>
+        <label class='sm m-0'>运输类型*</label>
+        <select name='CS_MODE' class='form-control' required>
+          <option>零担</option>
+          <option>短驳</option>
+          <option>整车</option>
+          <option>冷藏</option>
+          <option></option>
+          <option>海运</option>
+          <option>空运</option>
+          <option>其他</option>
+          <option></option>
+          <option>仓储</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class='form-row p-2'>
+      <div class='col-md-4 '>
+        <label class='sm m-0'>参考号码 </label>
+        <input type='text' name='CS_REF1' class='form-control'>
+      </div>
+
+      <div class='col-md-3 '>
+        <label class='sm m-0'>参考号码 </label>
+        <input type='text' name='CS_REF2' class='form-control'>
+      </div>
+
+      <div class='col-md-5 '>
+        <label class='sm m-0'>订单备注 </label>
+        <textarea name='CUSTOMER_REMARK' class='form-control'></textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <!--  shipping parties -->
+  <div class='mb-4' style='background:white; padding:10px; border-radius:5px; margin:10px; '>
+    <div class='form-row p-2'>
+      <div class='col-md-4 '>
+        <label class='sm m-0'>发货人*</label>
+        <input type='text' name='SHIPPER' class='form-control' list='shipper_list' onchange='shipper_con_tel()'
+          required />
+      </div>
+
+      <div class='col-md-3 '>
+        <label class='sm m-0'>联系人 </label>
+        <input type='text' name='SHIPPER_CONTACT' class='form-control' />
+      </div>
+    </div>
+
+    <div class='form-row p-2'>
+      <div class='col-md-4 '>
+        <label class='sm m-0'>收货人*</label>
+        <input type='text' name='CONSIGNEE' class='form-control' list='consignee_list' onchange='cnee_con_tel()'
+          required />
+      </div>
+
+      <div class='col-md-3 '>
+        <label class='sm m-0'>联系人 </label>
+        <input type='text' name='CONSIGNEE_CONTACT' class='form-control' />
+      </div>
+
+      <div class='col-md-5 '>
+        <label class='sm m-0'>移动电话 </label>
+        <input type='text' name='CONSIGNEE_TEL' class='form-control' />
+      </div>
+    </div>
+  </div>
+
+
+  <!-- product -->
+  <div class='mb-4' style='background:white; padding:10px; border-radius:5px; margin:10px;'>
+    <div class='form-row p-2'>
+      <div class='col-md-4 '>
+        <label class='sm m-0'>货物名称*</label>
+        <input type='text' name='PRODUCT' class='form-control' required />
+      </div>
+
+      <div class='col-md-2 '>
+        <label class='sm m-0'>货物类型*</label>
+        <select type='text' name='PRODUCT_TYPE' class='form-control' required>
+          <option selected>普货</option>
+          <option>恒温</option>
+          <option>冷藏</option>
+          <option>冷冻</option>
+        </select>
+      </div>
+
+      <div class='col-md-2 '>
+        <label class='sm m-0'>运输数量*</label>
+        <input type='number' name='QUANTITY' class='form-control' required />
+      </div>
+
+      <div class='col-md-2 '>
+        <label class='sm m-0'>包装类型*</label>
+        <input type='text' name='PACKAGE' class='form-control' list='package_list' required />
+      </div>
+
+      <div class='col-md-2 '>
+        <label class='sm m-0'>价值(RMB)</label>
+        <input type='number' name='VALUE' class='form-control' value='0' step='0.01' />
+      </div>
+    </div>
+
+    <div class='form-row p-2'>
+      <div class='col-md-3 '>
+        <label class='sm m-0'>体积(立方米)*</label>
+        <input type='number' name='VOLUME' class='form-control' step='0.001' value='0' required />
+      </div>
+
+      <div class='col-md-3 '>
+        <label class='sm m-0'>重量(公斤)*</label>
+        <input type='number' name='WEIGHT' class='form-control' step='0.01' value='0' required />
+      </div>
+
+      <div class='col-md-3 '>
+        <label class='sm m-0'>计费体积重量(吨,立方)*</label>
+        <input type='number' name='CHARGABLE_VW' class='form-control' step='0.001' min='0' max='299.99' required />
+      </div>
+
+      <div class='col-md-3 '>
+        <label class='sm m-0'>计费代码 </label>
+        <input type='text' name='CHARGABLE_RATE_ID' class='form-control' readonly />
+      </div>
+    </div>
+  </div>
+
+  <!-- ORI,DEST, OPERATIONS -->
+  <div class='mb-4' style='background:white; padding:10px; border-radius:5px; margin:10px;'>
+    <div class='form-row p-2'>
+      <div class='col-md-4 '>
+        <label class='sm m-0'>始发地*</label>
+        <input type='text' name='ORI' class='form-control' list='location_list' required />
+      </div>
+
+      <div class='col-md-8 '>
+        <label class='sm m-0'>提货地址*</label>
+        <input type='text' name='ORI_ADD' class='form-control' required />
+      </div>
+    </div>
+    <div class='form-row p-2 mb-2'>
+      <div class='col-md-4 '>
+        <label class='sm m-0'>目的地*</label>
+        <input type='text' name='DEST' class='form-control' list='location_list' required />
+      </div>
+
+      <div class='col-md-8 '>
+        <label class='sm m-0'>送货地址 </label>
+        <input type='text' name='DEST_ADD' class='form-control' required />
+      </div>
+    </div>
+
+    <div class='form-row p-2'>
+      <div class='col-md-3 '>
+        <label class='sm m-0'>发货日期</label>
+        <input type='date' name='DEP_DATE' class='form-control' min='2012-01-01' max='2030-12-31' />
+      </div>
+
+      <div class='col-md-3 '>
+        <label class='sm m-0'>预计到货日期</label>
+        <input type='date' name='ETA_DATE' class='form-control' min='2012-01-01' max='2030-12-31' />
+      </div>
+
+      <div class='col-md-3 '>
+        <label class='sm m-0'>最新跟踪 </label>
+        <input type='text' name='TRACK' class='form-control' />
+      </div>
+
+      <div class='col-md-3 '>
+        <label class='sm m-0'>实际到货日期 </label>
+        <input type='date' name='ARV_DATE' class='form-control' min='2012-01-01' max='2030-12-31' />
+      </div>
+    </div>
+
+    <div class='form-row p-2'>
+      <div class='col-md-3'>
+        <label class='sm m-0'>预计在途时间</label>
+        <input type='number' name='EST_LEADTIME' class='form-control bg-white' readonly />
+      </div>
+
+      <div class='col-md-3'>
+        <label class='sm m-0'>实际在途时间</label>
+        <input type='number' name='ACT_LEADTIME' class='form-control bg-white' readonly />
+      </div>
+
+      <div class='col-md-3'>
+        <label class='sm m-0'>到货状态</label>
+        <input type='text' name='ARV_STATUS' class='form-control bg-white' list='arv_status_list' />
+      </div>
+
+      <div class='col-md-3'>
+        <label class='sm m-0'>回单日期</label>
+        <div class='input-group'>
+          <input type='date' name='POD_DATE' class='form-control bg-white' min='2012-01-01' max='2030-12-31' />
+          <input type='text' name='POD_ID' class='form-control d-none' readonly />
+          <div class='input-group-append'>
+            <a class='btn btn-info text-white' id='POD_ID' onclick='openPOD();return false;'>&#10063;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class='form-row p-2'>
+      <div class='col-md-2'>
+        <label class='sm m-0'>短驳工作号</label>
+        <input class='form-control' type='text' name='PICKUP_JOBNO' />
+      </div>
+      <div class='col-md-3'>
+        <label class='sm m-0'>干线供应商*</label>
+        <input class='form-control' type='text' name='VENDOR' list='vendor_list'/>
+      </div>
+      <div class='col-md-1'>
+        <label class='sm m-0'>运输类型*</label>
+        <select name='VENDOR_MODE' class='form-control' required>
+          <option>零担</option>
+          <option>短驳</option>
+          <option>整车</option>
+          <option>冷藏</option>
+          <option></option>
+          <option>海运</option>
+          <option>空运</option>
+          <option>其他</option>
+          <option></option>
+          <option>仓储</option>
+        </select>
+      </div>
+      <div class='col-md-3'>
+        <label class='sm m-0'>供应商计费体重(吨,立方)*</label>
+        <input class='form-control' type='number' name='VENDOR_VW' step='0.001' min='0' max='299.99'required />
+      </div>
+      <div class='col-md-3'>
+        <label class='sm m-0'>成本代码</label>
+        <input class='form-control' type='number' name='VENDOR_RATE_ID' readonly />
+      </div>
+    </div>
+
+
+    <div class='form-row p-2'>
+      <div class='col-md-12'>
+        <label class='sm m-0'>操作说明</label>
+        <input class='form-control' type='text' name='OP_REMARK' />
+      </div>
+    </div>
+
+  </div>
+
+  <!-- accounting -->
+  <div class='mb-4' style='background:white; padding:10px; border-radius:5px; margin:10px;'>
+    <div class='form-row p-2'>
+      <div class='col-md-12 ' style='overflow:scroll;'>
+        <table id='pnl' class='table table-sm border-0'>
+          <thead class='text-right'>
+            <tr>
+              <td class='border-0'></td>
+              <td class='border-0'><label class="sm">包干费</label class="sm"></td>
+              <td class='border-0'><label class="sm">整车</label></td>
+              <td class='border-0'></td>
+              <td class='border-0 font-green'><label class="sm">零担单价</label></td>
+              <td class='border-0'><label class="sm">零担费</label></td>
+              <td class='border-0'><label class="sm">提货费</label></td>
+              <td class='border-0'><label class="sm">送货费</label></td>
+              <td class='border-0'><label class="sm">其他费1</label></td>
+              <td class='border-0'><label class="sm">其他费2</label></td>
+              <td class='border-0'><label class="sm">补偿费</label></td>
+              <td class='border-0'><label class="sm">小计</label></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class='border-0'><label class="bingo-cost sm">成本</label></td>
+              <td class='p-1'><input name='C_ALLIN' type='number'
+                  class='bingo-cost form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1'><input name='C_FTL' type='number'
+                  class='bingo-cost form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td></td>
+              <td class='p-1'><input name='C_LTL_RATE' type='number'
+                  class='bingo-cost form-control px-0 text-right border-top-0 border-right-0 border-left-0 '
+                  style='border-radius:0; color:var(--green);' value='0' step='0.01' min='0'></td>
+              <td class='p-1'><input name='C_LTL' type='number'
+                  class='bingo-cost form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1'><input name='C_PICKUP' type='number'
+                  class='bingo-cost form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1'><input name='C_DELIVERY' type='number'
+                  class='bingo-cost form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1'><input name='C_OTH1' type='number'
+                  class='bingo-cost form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1'><input name='C_OTH2' type='number'
+                  class='bingo-cost form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1'><input name='C_CLAIM' type='number'
+                  class='bingo-cost form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' max='0'></td>
+              <td class='p-1'><input name='TTL_COST' type='number'
+                  class='bingo-cost form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' readonly></td>
+            </tr>
+            <tr class=''>
+              <td class='border-0'><label class="bingo-revenue sm">收入</label></td>
+              <td class='p-1 border-0'><input name='R_ALLIN' type='number'
+                  class='bingo-revenue form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1 border-0'><input name='R_FTL' type='number'
+                  class='bingo-revenue form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1 border-0'></td>
+              <td class='p-1 border-0'><input name='R_LTL_RATE' type='number'
+                  class='bingo-revenue form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0; color:var(--green)' value='0' step='0.01' min='0'></td>
+              <td class='p-1 border-0'><input name='R_LTL' type='number'
+                  class='bingo-revenue form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1 border-0'><input name='R_PICKUP' type='number'
+                  class='bingo-revenue form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1 border-0'><input name='R_DELIVERY' type='number'
+                  class='bingo-revenue form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1 border-0'><input name='R_OTH1' type='number'
+                  class='bingo-revenue form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1 border-0'><input name='R_OTH2' type='number'
+                  class='bingo-revenue form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' min='0'></td>
+              <td class='p-1 border-0'><input name='R_CLAIM' type='number'
+                  class='bingo-revenue form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' max='0'></td>
+              <td class='p-1 border-0'><input name='TTL_REV' type='number'
+                  class='bingo-revenue form-control px-0 text-right border-top-0 border-right-0 border-left-0'
+                  style='border-radius:0;' value='0' step='0.01' readonly></td>
+            </tr>
+            <tr>
+              <td class='border-0'><label class='bingo-cost bingo-revenue sm'>GP</label></td>
+              <td class='p-1 border-0'><input name='GP' type='number'
+                  class='bingo-cost bingo-revenue form-control px-0 text-right px-0 text-right border-top-0 border-right-0 border-left-0 bg-white'
+                  style='border-radius:0;' value='0.00' step='0.01' readonly></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- claim -->
+  <div class='mb-4' style='background:white; padding:10px; border-radius:5px; margin:10px;'>
+    <div class='form-row p-2'>
+      <div class='col-md-3'>
+        <label class='sm m-0'>投诉类型</label>
+        <input class='form-control' type='text' name='DAMAGE_STATUS' list='damage_status_list' />
+      </div>
+
+      <div class='col-md-9'>
+        <label class='sm m-0'>情况说明</label>
+        <input class='form-control' type='text' name='DAMAGE_REPORT' />
+      </div>
+
+    </div>
+    <div class='form-row p-2'>
+
+      <div class='col-md-12'>
+        <label class='sm m-0'>处理结果</label>
+        <input class='form-control' type='text' name='DAMAGE_RESOLUTION' />
+      </div>
+
+    </div>
+
+  </div>
+  <!-- shipment final remark -->
+  <div class='mb-4' style='background:white; padding:10px; border-radius:5px; margin:10px;'>
+    <div class='form-row'>
+      <div class='col-12'>
+        <div class='form-group'>
+          <label class='sm m-0'>作业总结: </label>
+          <input class='form-control' type='text' name='REMARK' />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- foot data -->
+  <div class='mb-4' style='background:white; padding:10px; border-radius:5px; margin:10px;'>
+    <div class='form-row p-2'>
+      <div class='col-md-12'>
+        <label>创建:</label>
+        <input class='border-0' type='text' name='ENTER_BY'  readonly>
+        <label>更新:</label>
+        <input class='border-0' type='text' name='UPDATE_BY'  readonly>
+        <label><i class="material-icons md-18">lock</i></label>
+        <input class='border-0' type='text' name='LOCKED' value='0'  readonly>
+      </div>
+      <!--
+      <div class='col-md-3'>
+        <input class='form-control' type='text' name='CDT' readonly>
+        <input class='form-control d-none' type='text' name='UDT' readonly>
+      </div>
+      -->
+    </div>
+  </div>
+
+</form>
+
+<script>
+  $(function () {
+    inputTrim();
+    shipment_form_ini();
+    shipment_changed();
+    pnl();
+  });
+
+
+  function inputTrim() {
+    $('input').change(function () {
+      this.value = $.trim(this.value);
+    })
+  };
+
+  function shipment_form_ini() {
+    // set the form as not-changed
+    $('#shipment_form').data('change', '');
+
+    // station //
+    var scope = $('#session_scope').html();
+    var scopes = scope.split(',');
+    $('select[name="STATION"]').empty();
+    for (i in scopes) {
+      $('select[name="STATION"]').append($('<option>').text(scopes[i]));
+    }
+
+    // enter_by/update_by
+    var session_user = $('#session_username').html();
+    $('#shipment_form input[name="ENTER_BY"]').val(session_user);
+    $('#shipment_form input[name="UPDATE_BY"]').val(session_user);
+
+    // acc_mon
+    cur_year = new Date().getFullYear();
+    last_year = cur_year;
+    next_year = cur_year;
+
+
+    cur_mon = new Date().getMonth() + 1;
+    last_mon = cur_mon - 1;
+    next_mon = cur_mon + 1;
+
+    if (cur_mon < 10) {
+      cur_mon = '0' + cur_mon;
+    };
+    acc_mon = cur_year + '-' + cur_mon;
+
+    if (last_mon < 10 && last_mon != 0) {
+      last_mon = '0' + last_mon;
+    }
+
+    if (last_mon == 0) {
+      last_mon = '12';
+      last_year = cur_year - 1;
+    }
+    acc_mon_last = last_year + '-' + last_mon;
+
+    if (next_mon < 10) {
+      next_mon = '0' + next_mon;
+    }
+    if (next_mon == 13) {
+      next_year = next_year + 1;
+      next_mon = '01';
+    }
+    acc_mon_next = next_year + '-' + next_mon;
+
+    $('#shipment_form select[name="ACC_MON"]').empty().append($('<option value="">请选择</option>')).append($('<option>')
+      .text(acc_mon_next)).append($('<option selected>').text(acc_mon)).append($('<option>').text(acc_mon_last));
+
+    // order_date
+    cur_date = new Date().getDate();
+    if (cur_date < 10) {
+      cur_date = '0' + cur_date
+    };
+    var order_date = cur_year + '-' + cur_mon + '-' + cur_date;
+    $('#shipment_form input[name="ORDER_DATE"]').val(order_date);
+
+  }
+
+  // inline function & query //
+  // check if anything changed before submit
+  function shipment_changed() {
+    $('#shipment_form input').on('change', function () {
+      $('#shipment_form').data('change', 'changed');
+    });
+
+    $('#shipment_form select').on('change', function () {
+      $('#shipment_form').data('change', 'changed');
+    });
+
+    $('#shipment_form textarea').on('change', function () {
+      $('#shipment_form').data('change', 'changed');
+    });
+  }
+
+  function shipper_con_tel() {
+    var shipper = $('input[name="SHIPPER"]').val();
+    $.get(
+      'shipper_load_data.php?shipper=' + shipper,
+      function (data, status) {
+        var datas = JSON.parse(data);
+        if (datas.length == 0) {
+          return;
+        }
+        $('input[name="SHIPPER_CONTACT"]').val(datas[0]['CONTACT']);
+        $('input[name="ORI"]').val(datas[0]['DEFAULT_ORI']);
+        $('input[name="ORI_ADD"]').val(datas[0]['DEFAULT_ADD']);
+      }
+    )
+  }
+
+  function cnee_con_tel() {
+    var consignee = $('input[name="CONSIGNEE"]').val();
+    $.get(
+      'consignee_load_data.php?consignee=' + consignee,
+      function (data, status) {
+        var datas = JSON.parse(data);
+        if (datas.length == 0) {
+          return;
+        }
+        $('input[name="CONSIGNEE_CONTACT"]').val(datas[0]['CONTACT'])
+        $('input[name="CONSIGNEE_TEL"]').val(datas[0]['MOBILE']);
+        $('input[name="DEST"]').val(datas[0]['DEFAULT_DEST']);
+        $('input[name="DEST_ADD"]').val(datas[0]['DEFAULT_ADD']);
+      }
+    )
+  }
+
+  // P&L auto-calculation
+  function pnl() {
+    $('#pnl input[type="number"]').on('change', function () {
+      var ttl_cost = $('#pnl input[name="C_ALLIN"]').val() * 1 +
+        $('#pnl input[name="C_FTL"]').val() * 1 +
+        $('#pnl input[name="C_LTL"]').val() * 1 +
+        $('#pnl input[name="C_PICKUP"]').val() * 1 +
+        $('#pnl input[name="C_DELIVERY"]').val() * 1 +
+        $('#pnl input[name="C_OTH1"]').val() * 1 +
+        $('#pnl input[name="C_OTH2"]').val() * 1 +
+        $('#pnl input[name="C_CLAIM"]').val() * 1;
+      var ttl_rev = $('#pnl input[name="R_ALLIN"]').val() * 1 +
+        $('#pnl input[name="R_FTL"]').val() * 1 +
+        $('#pnl input[name="R_LTL"]').val() * 1 +
+        $('#pnl input[name="R_PICKUP"]').val() * 1 +
+        $('#pnl input[name="R_DELIVERY"]').val() * 1 +
+        $('#pnl input[name="R_OTH1"]').val() * 1 +
+        $('#pnl input[name="R_OTH2"]').val() * 1 +
+        $('#pnl input[name="R_CLAIM"]').val() * 1;
+
+      $('#pnl input[name="TTL_COST"]').val(ttl_cost);
+      $('#pnl input[name="TTL_REV"]').val(ttl_rev);
+      $('#pnl input[name="GP"]').val(ttl_rev - ttl_cost);
+    });
+  }
+
+
+  //
+  function openPOD() {
+    var pod_id = $('#shipment_form input[name="POD_ID"]').val();
+    //console.log('pod_id:' + pod_id);
+    if (pod_id) {
+      newwindow = window.open("https://drive.google.com/file/d/" + pod_id+"/preview", "_blank");
+    }
+    return;
+  }
+
+
+  // load shipment record //
+  function getShipmentRecord(id) {
+    $.get('load_shipment_record.php?id=' + id,
+      function (data, status) {
+        showShipmentRecord(data);
+      }
+    )
+  }
+
+  function showShipmentRecord(data) {
+    var rec = JSON.parse(data)[0];
+    var keys = Object.keys(rec);
+    for (i in keys) {
+      $('#shipment_form [name="' + keys[i] + '"]').val(rec[keys[i]]);
+    }
+
+    // set data-change status empty - not changed
+    $('#shipment_form').data('change', '');
+
+    // for <select>, if value is not in option, should add into it and make it selected //
+    var acc_mon = rec['ACC_MON'];
+    var acc_mons = [];
+    $('#shipment_form select[name="ACC_MON"] option').each(function (i, ele) {
+      acc_mons.push($(ele).text())
+    });
+    if (acc_mons.indexOf(acc_mon) == -1) {
+      $('#shipment_form select[name="ACC_MON"]').append($('<option selected>' + acc_mon + '</option>'))
+    }
+
+    var station = rec['STATION'];
+    var stations = [];
+    $('#shipment_form select[name="STATION"] option').each(function (i, ele) {
+      stations.push($(ele).text())
+    });
+    if (stations.indexOf(station) == -1) {
+      $('#shipment_form select[name="STATION"]').append($('<option selected>' + station + '</option>'))
+    }
+
+    // lock data ? //;
+    if (rec['LOCKED'] == 1) {
+      $('#shipment_form input').attr('disabled', true);
+      $('#shipment_form select').attr('disabled', true);
+      $('#shipment_form textarea').attr('disabled', true);
+    } else {
+      $('#shipment_form input').attr('disabled', false);
+      $('#shipment_form select').attr('disabled', false);
+      $('#shipment_form textarea').attr('disabled', false);
+    }
+  }
+
+  //add (reset) shipment
+  function addShipment() {
+    $("#shipment_form").trigger("reset")
+    $("#shipment_form").find('[name="CUSTOMER"]').attr('readonly', false);
+    $('#shipment_form input').attr('disabled', false);
+    $('#shipment_form select').attr('disabled', false);
+    $('#shipment_form textarea').attr('disabled', false);
+    shipment_form_ini();
+  }
+
+  // save or update record //
+  function saveShipmentData(ele) {
+    var form = document.getElementById('shipment_form');
+    var form_check = form.reportValidity();
+    if (!form_check) {
+      message('检查数据')
+    } else {
+
+      var changed = $('#shipment_form').data('change');
+
+      if (changed != 'changed') { // nothing changed //
+        //console.log('nothing changed');
+        message('无所适从');
+        return;
+      } else {
+
+        var id = $('#shipment_form input[name="ID"]').val();
+        //console.log('id=' + id);
+        if (id > 0) {
+          $('#shipment_form input[name="UPDATE_BY"]').val(sessionStorage.getItem('session_username'))
+        }
+
+        data = $(ele).serializeArray();
+        $.post(
+          'shipment_save_data.php',
+          data,
+          function (response, status) {
+            if (response.indexOf('更新') >= 0) {
+              $('#shipment_form').data('change', '');
+            }
+            message(response);
+          }
+        )
+
+      }
+    }
+  }
+</script>

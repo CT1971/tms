@@ -1,0 +1,347 @@
+<div class='d-flex flex-column' style='height:100vh; width:100vw; padding:0px; background:rgb(250,250,250)'>
+  <div id='menu' class='text-white p-2 d-flex w-100 justify-content-between'
+    style='background-color:var(--theme_color)'>
+    <!-- real menu -->
+    <div class='flex-grow-1'>
+      <div class='btn-group' role='group'>
+        <i class="material-icons md-24 mr-3 " onclick='shipment_manager()'>create</i>
+        <i class="material-icons md-24 mr-3 " onclick='batchInput()'>cloud_upload</i>
+        <i class="material-icons md-24 mr-3 " onclick='power_search()'>departure_board</i>
+        <i class="material-icons md-24 mr-3 " onclick='report()'>library_books</i>
+        <i class="material-icons md-24 mr-3 " onclick='free_report()'>build</i>
+      </div>
+      <div class='btn-group' role='group'>
+        <a class="dropdown-toggle" data-toggle="dropdown"><i class="material-icons md-24">ballot</i></a>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" onclick="customer_manager()">客户</a>
+          <a class="dropdown-item" onclick="shipper_manager()">发货人</a>
+          <a class="dropdown-item" onclick="consignee_manager()">收货人</a>
+          <div class='dropdown-divider'></div>
+          <a class="dropdown-item" onclick="vendor_manager()">供应商</a>
+          <div class='dropdown-divider'></div>
+          <a class="dropdown-item" onclick="loc_manager()">标准地名</a>
+          <div class='dropdown-divider'></div>
+          <a class="dropdown-item bingo-admin" onclick='user_manager()'>用户管理</a>
+          <div class='dropdown-divider'></div>
+          <a class="dropdown-item bingo-admin">
+            <i class='material-icons md-18'>lock_open</i>
+            <input type="text" class="border rounded" style="width:80px;" onchange="unlockShipment($(this).val())"></a>
+          <a class="dropdown-item bingo-admin">
+            <i class='material-icons md-18'>lock</i>
+            <input type="text" class="border rounded" style="width:80px;" onchange="lockShipment($(this).val())"></a>
+        </div>
+      </div>
+    </div>
+    <!-- user info -->
+    <div class='font-weight-light d-flex' style="align-items:center; color:rgb(240,240,240)">
+      <i class="material-icons md-24 mr-4" onclick='message()'>message</i>
+      <div>
+        <div class='dropdown-toggle' data-toggle='dropdown'><i class="material-icons md-24 mr-2">people</i><span
+            id='session_username'></span></div>
+        <div class='dropdown-menu'>
+          <div class='dropdown-item'>
+            <div>权限 : <span id='session_role'></span></div>
+            <div>电邮 : <span id='session_email'></span></div>
+            <div>区域 : <span id='session_scope'></span></div>
+            <div class='d-none'>WHERE:<span id='session_scope_where'></span></div>
+          </div>
+          <div class='dropdown-divider'></div>
+          <a class='dropdown-item' onclick="tmsLogout();">登出</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id='main' class='d-flex flex-grow-1' style='overflow:scroll;'>
+    <div>
+      <p>请使用 google Chrome 浏览器！</p>
+
+    </div>
+  </div>
+</div>
+<div id='message-container' class='fixed-top bk-white text-center m-auto align-items-center'
+  style='width:400px; height:100px; border-radius:0px 0px 3px 3px; border:1px solid var(--gray); border-top:4px solid var(--gray); display:none;'
+  onclick='$(this).hide();'>
+  <div class='h-100 w-100 d-flex p-2'>
+    <div id='message' class='my-auto' style='margin:auto;'>message</div>
+  </div>
+</div>
+
+<!-- install datalists : stay while the system is working -->
+<div class='d-none'>
+  <datalist id='location_list'></datalist>
+  <datalist id='shipper_list'></datalist>
+  <datalist id='consignee_list'></datalist>
+  <datalist id='vendor_list'></datalist>
+  <datalist id='customer_list'></datalist>
+  <datalist id='package_list'>
+    <option>托盘</option>
+    <option>纸箱</option>
+    <option>桶</option>
+    <option>件</option>
+    <option>散装</option>
+    <option>集装箱</option>
+    <option>木箱</option>
+    <option>袋</option>
+    <option>包</option>
+  </datalist>
+  <datalist id='arv_status_list'>
+    <option>完好</option>
+    <option>窜货</option>
+    <option>货损</option>
+    <option>货失</option>
+    <option>受潮</option>
+    <option>污染</option>
+  </datalist>
+  <datalist id='damage_status_list'>
+    <option></option>
+    <option>货损货失</option>
+    <option>包装损坏</option>
+    <option>违规混装</option>
+    <option>迟到</option>
+    <option>服务态度</option>
+  </datalist>
+  <datalist id='search_fieldlist'>
+    <option selected>选择</option>
+    <option value='STATION'>站点</option>
+    <option value='STATION'>站点</option>
+    <option value='CUSTOMER'>客户</option>
+    <option value='SHIPPER'>发货人</option>
+    <option value='CONSIGNEE'>收货人</option>
+    <option value='ORI'>始发地</option>
+    <option value='DEST'>目的地</option>
+    <option value='DEP_DATE'>发货日期</option>
+    <option value='ARV_DATE'>到达日期</option>
+  </datalist>
+
+</div>
+
+
+<script>
+  // bug //
+  // var url = "tms_ini.js";
+  // $.getScript(url);
+  // console.log(tms_ini('roles'))
+</script>
+
+<script>
+  $(function () {
+    //$.getScript('tms_ini.js'); // is this useful?
+    $('#session_username').text(sessionStorage.getItem('session_username'));
+    $('#session_role').text(sessionStorage.getItem('session_role'));
+    $('#session_scope').text(sessionStorage.getItem('session_scope'));
+    $('#session_email').text(sessionStorage.getItem('session_email'));
+    var where_string = ' STATION in ( ';
+    var scopes = $('#session_scope').text().split(',');
+    for (i = 0; i < scopes.length; i++) {
+      where_string += '"' + scopes[i] + '" ';
+      if (i < scopes.length - 1) {
+        where_string += ', '
+      }
+    }
+    where_string += ') ';
+    $('#session_scope_where').text(where_string);
+
+    // install <datalist>
+    locationList();
+    shipperList();
+    consigneeList();
+    vendorList();
+    customerList();
+    roleControl();
+
+    // for super usrer //
+    document.getElementsByTagName('body')[0].addEventListener('keyup', function () {
+      su()
+    })
+  });
+
+  function roleControl() {
+    $('body').append('<style> .bingo-admin, .bingo-cost, .bingo-revenue {display:none} </style>');
+    $('body').append($(style));
+
+    var session_role = $('#session_role').text();
+    var style = '';
+    switch (session_role) {
+      case 'user_rev':
+        var style = '<style> .bingo-revenue {display:block} .bingo-revenue.bingo-cost{display:none} </style>';
+        break;
+      case 'user_cost':
+        var style = '<style> .bingo-cost {display:block} .bingo-revenue.bingo-cost{display:none}</style>';
+        break;
+      case 'user':
+        var style = '<style> .bingo-cost, .bingo-revenue {display:block} </style>';
+        break;
+      case 'admin':
+        var style = "<style> .bingo-admin, .bingo-cost, .bingo-revenue {display:block}</style>";
+        break;
+      default:
+        style = '';
+    }
+    $('body').append($(style));
+  }
+
+  // special for search menu //
+  function message(msg) {
+    if (msg) {
+      var time = new Date();
+      var hh = time.getHours();
+      var mm = time.getMinutes();
+      $('#message').html('<span class="text-secondary small">[ ' + hh + ':' + mm + ' ]</span> ' + msg);
+    }
+    $('#message-container').show();
+    setTimeout(function () {
+      $('#message-container').slideUp(50);
+    }, 1500)
+  }
+
+  // install datalist //
+  function locationList() {
+    $.get('location_list.php', function (data, status) {
+      datalist = $('#location_list');
+      var datas = JSON.parse(data);
+      for (i in datas) {
+        datalist.append('<option>' + datas[i][0] + '</option>')
+      }
+    });
+  }
+
+  function shipperList() {
+    $.get('shipper_list.php', function (data, status) {
+      datalist = $('#shipper_list');
+      var datas = JSON.parse(data);
+      for (i in datas) {
+        datalist.append('<option>' + datas[i][0] + '</option>')
+      }
+    });
+  }
+
+  function consigneeList() {
+    $.get('consignee_list.php', function (data, status) {
+      datalist = $('#consignee_list');
+      var datas = JSON.parse(data);
+      for (i in datas) {
+        datalist.append('<option>' + datas[i][0] + '</option>')
+      }
+    });
+  }
+
+  function vendorList() {
+    $.get('vendor_list.php', function (data, status) {
+      datalist = $('#vendor_list');
+      var datas = JSON.parse(data);
+      for (i in datas) {
+        datalist.append('<option>' + datas[i][0] + '</option>')
+      }
+    });
+  }
+
+  function customerList() {
+    $.get('customer_list.php', function (data, status) {
+      datalist = $('#customer_list');
+      var datas = JSON.parse(data);
+      for (i in datas) {
+        datalist.append('<option>' + datas[i][0] + '</option>')
+      }
+    });
+  }
+
+
+  // controls //
+  function user_manager() {
+    var random = Math.round(Math.random() * 100);
+    $('#main').load('user_manager.html?v=' + random);
+  }
+
+  function loc_manager() {
+    var random = Math.round(Math.random() * 100);
+    $('#main').load('loc_manager.html?v=' + random);
+  }
+
+  function customer_manager() {
+    var random = Math.round(Math.random() * 100);
+    $('#main').load('customer_manager.html?v=' + random);
+  }
+
+  function shipper_manager() {
+    var random = Math.round(Math.random() * 100);
+    $('#main').load('shipper_manager.html?v=' + random);
+  }
+
+  function consignee_manager() {
+    var random = Math.round(Math.random() * 100);
+    $('#main').load('consignee_manager.html?v=' + random);
+  }
+
+  function vendor_manager() {
+    var random = Math.round(Math.random() * 100);
+    $('#main').load('vendor_manager.html?v=' + random);
+  }
+
+  function shipment_manager() {
+    var random = Math.round(Math.random() * 1000);
+    $('#main').load('shipment_manager.html?v=' + random);
+  }
+
+  function batchInput() {
+    var random = Math.round(Math.random() * 100);
+    $('#main').empty().load('batch_input.html?v=' + random);
+  }
+
+  function power_search() {
+    var rand = Math.round(Math.random() * 1000);
+    $('#main').load('search.html?v=' + rand);
+  }
+
+  function report() {
+    var rand = Math.round(Math.random() * 100);
+    $('#main').load('report.html?v=' + rand);
+  }
+
+  function free_report() {
+    var rand = Math.round(Math.random() * 100);
+    $('#main').load('free_report.html?v=' + rand);
+  }
+
+  function tmsLogout() {
+    $.post('tms_logout.php', 1, function (data, status) {
+      $('html').html(data)
+    })
+  }
+
+  function su() {
+    if (event.keyCode == 220 && event.ctrlKey) {
+      if ($("#command_window").length) {
+        $("#command_window").remove();
+      } else {
+        var command = $('<div id="command_window">').load('command.html?v=3');
+        $('body').append(command);
+      }
+    }
+  }
+
+  function unlockShipment(id) {
+    if (id=='' || id == null){return;}
+    $.post(
+      'lock_shipment.php', {
+        id: id,
+        lock: 0
+      },
+      function (data, status) {
+        message(data);
+      }
+    )
+  }
+
+  function lockShipment(id) {
+    if (id=='' || id == null){return;}
+    $.post(
+      'lock_shipment.php', {
+        id: id,
+        lock: 1
+      },
+      function (data, status) {
+        message(data);
+      }
+    )
+  }
+</script>

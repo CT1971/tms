@@ -1,0 +1,219 @@
+<form class='container' style='min-width:800px;'
+  onsubmit='$(this).parent().parent().trigger("click"); powerSearch($(this)); return false;'>
+
+  <div class='form-row align-items-center mb-1'>
+    <div class='col-md-2 text-center'>条件</div>
+    <!-- condition 1 -->
+    <div class='col-md-3'>
+      <div style='display:flex;' class='border'>
+        <select name='search_field' style='border:none; padding:0; background:var(--lightsilver); border-radius:0;'>
+          <option selected value=''></option>
+          <option value='STATION'>站点</option>
+          <option value='CUSTOMER'>客户</option>
+          <option value='SHIPPER'>发货人</option>
+          <option value='CONSIGNEE'>收货人</option>
+          <option value='ORI'>始发地</option>
+          <option value='DEST'>目的地</option>
+          <option value='DEP_DATE'>发货日期</option>
+          <option value='ARV_DATE'>到达日期</option>
+        </select>
+        <select name='search_cond'
+          style='border:none; border-radius:0; text-align:center; padding:3px; margin:0;text-align-last:center; '>
+          <option value='' selected></option>
+          <option value='='>=</option>
+          <option value='>'>></option>
+          <option value='<'>&lt;</option>
+          <option value='>='>>=</option>
+          <option value='<='>&lt;=</option>
+          <option value=' like '>~</option>
+          <option value=' <>'>&lt;></option>
+        </select>
+        <input name='search_value' class='form-control' style='border:none; border-radius:0'>
+      </div>
+    </div>
+    <!-- condition 2 -->
+    <div class='col-md-3'>
+      <div style='display:flex;' class='border'>
+        <select name='search_field' style='border:none; padding:0; background:var(--lightsilver); border-radius:0;'>
+          <option selected value=''></option>
+          <option value='STATION'>站点</option>
+          <option value='CUSTOMER'>客户</option>
+          <option value='SHIPPER'>发货人</option>
+          <option value='CONSIGNEE'>收货人</option>
+          <option value='ORI'>始发地</option>
+          <option value='DEST'>目的地</option>
+          <option value='DEP_DATE'>发货日期</option>
+          <option value='ARV_DATE'>到达日期</option>
+        </select>
+        <select name='search_cond'
+          style='border:none; border-radius:0; text-align:center; padding:3px; margin:0;text-align-last:center; '>
+          <option value='' selected></option>
+          <option value='='>=</option>
+          <option value='>'>></option>
+          <option value='<'>&lt;</option>
+          <option value='>='>>=</option>
+          <option value='<='>&lt;=</option>
+          <option value=' like '>~</option>
+          <option value=' <>'>&lt;></option>
+        </select>
+        <input name='search_value' class='form-control' style='border:none; border-radius:0'>
+      </div>
+    </div>
+    <!-- condition 3 -->
+    <div class='col-md-3'>
+      <div style='display:flex;' class='border'>
+        <select name='search_field' style='border:none; padding:0; background:var(--lightsilver); border-radius:0;'>
+          <option selected value=''></option>
+          <option value='STATION'>站点</option>
+          <option value='CUSTOMER'>客户</option>
+          <option value='SHIPPER'>发货人</option>
+          <option value='CONSIGNEE'>收货人</option>
+          <option value='ORI'>始发地</option>
+          <option value='DEST'>目的地</option>
+          <option value='DEP_DATE'>发货日期</option>
+          <option value='ARV_DATE'>到达日期</option>
+        </select>
+        <select name='search_cond'
+          style='border:none; border-radius:0; text-align:center; padding:3px; margin:0;text-align-last:center; '>
+          <option value='' selected></option>
+          <option value='='>=</option>
+          <option value='>'>></option>
+          <option value='<'>&lt;</option>
+          <option value='>='>>=</option>
+          <option value='<='>&lt;=</option>
+          <option value=' like '>~</option>
+          <option value=' <>'>&lt;></option>
+        </select>
+        <input name='search_value' class='form-control' style='border:none; border-radius:0'>
+      </div>
+    </div>
+  </div>
+
+  <!-- condition 4 -->
+  <div class='form-row align-items-center mb-3'>
+    <div class='col-md-2'></div>
+    <div class='col-md-3'>
+      <div style='display:flex;' class='border'>
+        <select name='search_field' style='border:none; padding:0; background:var(--lightsilver); border-radius:0;'>
+          <option selected value=''></option>
+          <option value='STATION'>站点</option>
+          <option value='CUSTOMER'>客户</option>
+          <option value='SHIPPER'>发货人</option>
+          <option value='CONSIGNEE'>收货人</option>
+          <option value='ORI'>始发地</option>
+          <option value='DEST'>目的地</option>
+          <option value='DEP_DATE'>发货日期</option>
+          <option value='ARV_DATE'>到达日期</option>
+        </select>
+        <select name='search_cond'
+          style='border:none; border-radius:0; text-align:center; padding:3px; margin:0;text-align-last:center; '>
+          <option value='' selected></option>
+          <option value='='>=</option>
+          <option value='>'>></option>
+          <option value='<'>&lt;</option>
+          <option value='>='>>=</option>
+          <option value='<='>&lt;=</option>
+          <option value=' like '>~</option>
+          <option value=' <>'>&lt;></option>
+        </select>
+        <input name='search_value' class='form-control' style='border:none; border-radius:0'>
+      </div>
+    </div>
+    <!-- condition 5 -->
+    <div class='col-md-3'>
+      <div style='display:flex;' class='border'>
+        <select name='search_field' style='border:none; padding:0; background:var(--lightsilver); border-radius:0;'>
+          <option selected value=''></option>
+          <option value='STATION'>站点</option>
+          <option value='CUSTOMER'>客户</option>
+          <option value='SHIPPER'>发货人</option>
+          <option value='CONSIGNEE'>收货人</option>
+          <option value='ORI'>始发地</option>
+          <option value='DEST'>目的地</option>
+          <option value='DEP_DATE'>发货日期</option>
+          <option value='ARV_DATE'>到达日期</option>
+        </select>
+        <select name='search_cond'
+          style='border:none; border-radius:0; text-align:center; padding:3px; margin:0;text-align-last:center; '>
+          <option value='' selected></option>
+          <option value='='>=</option>
+          <option value='>'>></option>
+          <option value='<'>&lt;</option>
+          <option value='>='>>=</option>
+          <option value='<='>&lt;=</option>
+          <option value=' like '>~</option>
+          <option value=' <>'>&lt;></option>
+        </select>
+        <input name='search_value' class='form-control' style='border:none; border-radius:0'>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- order -->
+  <div class='form-row align-items-center mb-3'>
+    <div class='col-md-2 text-center'>排序</div>
+    <div class='col-md-3'>
+      <select name='search_order_by' class='form-control' style=' padding:0;; border-radius:0; text-align-last:center;'>
+        <option selected value=''></option>
+        <option value='STATION'>站点</option>
+        <option value='CUSTOMER'>客户</option>
+        <option value='SHIPPER'>发货人</option>
+        <option value='CONSIGNEE'>收货人</option>
+        <option value='ORI'>始发地</option>
+        <option value='DEST'>目的地</option>
+        <option value='DEP_DATE'>发货日期</option>
+        <option value='ARV_DATE'>到达日期</option>
+      </select>
+    </div>
+    <div class='col-md-3'>
+      <select name='search_order_by' class='form-control' style=' padding:0;; border-radius:0; text-align-last:center;'>
+        <option selected value=''></option>
+        <option value='STATION'>站点</option>
+        <option value='CUSTOMER'>客户</option>
+        <option value='SHIPPER'>发货人</option>
+        <option value='CONSIGNEE'>收货人</option>
+        <option value='ORI'>始发地</option>
+        <option value='DEST'>目的地</option>
+        <option value='DEP_DATE'>发货日期</option>
+        <option value='ARV_DATE'>到达日期</option>
+      </select>
+    </div>
+    <div class='col-md-3'>
+      <select name='search_order_by' class='form-control' style=' padding:0;; border-radius:0; text-align-last:center;'>
+        <option selected value=''></option>
+        <option value='STATION'>站点</option>
+        <option value='CUSTOMER'>客户</option>
+        <option value='SHIPPER'>发货人</option>
+        <option value='CONSIGNEE'>收货人</option>
+        <option value='ORI'>始发地</option>
+        <option value='DEST'>目的地</option>
+        <option value='DEP_DATE'>发货日期</option>
+        <option value='ARV_DATE'>到达日期</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 预选信息组合 -->
+  <div class='form-row align-items-center'>
+    <div class='col-md-2 text-center'>信息组合</div>
+    <div class='col-md-2'>
+      <select name='search_preset' class='form-control' style=' padding:0;; border-radius:0; text-align-last:center;'>
+        <option selected value=''></option>
+        <option value='STATION'>站点</option>
+        <option value='CUSTOMER'>客户</option>
+        <option value='SHIPPER'>发货人</option>
+        <option value='CONSIGNEE'>收货人</option>
+        <option value='ORI'>始发地</option>
+        <option value='DEST'>目的地</option>
+        <option value='DEP_DATE'>发货日期</option>
+        <option value='ARV_DATE'>到达日期</option>
+      </select>
+    </div>
+    <div class='col-md-2 text-center'></div>
+    <div class='col-md-2 text-center'></div>
+    <div class='col-md-2 text-center'></div>
+    <div class='col-md-2 text-center'><input type='submit' class='btn btn-primary btn-block' value='搜索'></div>
+  </div>
+
+</form>

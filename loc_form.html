@@ -1,0 +1,114 @@
+<div class='card col-md-8' style='padding:0;'>
+  <div class='card-header'>
+    <h5 class='w-100'><span class='badge badge-info'>地名</span><span id='loc-title' class='float-right'>新增地点</span></h5>
+  </div>
+  <div class='card-body'>
+    <form id='loc_form' onsubmit='saveLocData(this); return false;' autocomplete="off">
+      <div class='form-group form-inline d-none'>
+        <label class='col-md-2 d-inline text-right'>ID</label>
+        <input class='col-md-10 form-control' name='ID' type='number' readonly>
+      </div>
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>全名:</label>
+        <input class='col-md-10 form-control' name='FULL_NAME' type='text' autocomplete="off" readonly>
+      </div>
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>国家:</label>
+        <input class='col-md-10 form-control' name='COUNTRY' type='text' value='中国' autocomplete="off" required>
+      </div>
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>省级:</label>
+        <input class='col-md-10 form-control' name='STATE' type='text' required>
+      </div>
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>地级:</label>
+        <input class='col-md-10 form-control' name='CITY' type='text' required>
+      </div>
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>县级:</label>
+        <input class='col-md-10 form-control' name='COUNTY' type='text'>
+      </div>
+
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>邮编:</label>
+        <input class='col-md-10 form-control' name='ZIP' type='text'>
+      </div>
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>区号:</label>
+        <input class='col-md-10 form-control' name='AREA_CODE' type='text'>
+      </div>
+
+      <div class='form-group form-inline'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>录入:</label>
+        <input class='col-md-10 form-control' name='ENTER_BY' type='text' readonly>
+      </div>
+
+      <div class='form-group form-inline d-none'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>注册时间:</label>
+        <input class='col-md-10 form-control' name='CDT' type='datetime' readonly>
+      </div>
+      <div class='form-group form-inline d-none'>
+        <label class='col-md-2 d-inline text-right' style='text-align:left;'>更新时间:</label>
+        <input class='col-md-10 form-control' name='UDT' type='datetime' readonly>
+      </div>
+      <div class='w-100'></div>
+      <div class='row'>
+        <div class='col-md-2'></div>
+        <div class='col-md-10'><input type='submit' class='btn btn-primary float-right' value='确认'></div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  // inline editing //
+  $(function() {
+    $('input').change(function() {
+      this.value = $.trim(this.value);
+    })
+  });
+
+  $(function() {
+    $('#loc_form [name="STATE"]').on('change', function() {
+      buildFullName();
+    });
+    $('#loc_form [name="CITY"]').on('change', function() {
+      buildFullName();
+    });
+    $('#loc_form [name="COUNTY"]').on('change', function() {
+      buildFullName();
+    });
+  })
+
+  function buildFullName() {
+    var state = $('#loc_form [name="STATE"]').val();
+    var city = $('#loc_form [name="CITY"]').val();
+    var county = $('#loc_form [name="COUNTY"]').val();
+    if (county != '') {
+      var full_name_fly = state + '-' + city + '-' + county
+    } else {
+      var full_name_fly = state + '-' + city;
+    }
+
+    $('#loc_form [name="FULL_NAME"]').val(full_name_fly)
+  }
+
+
+  function saveLocData(ele) {
+    $('#loc_form [name="ENTER_BY"]').val(sessionStorage.getItem('session_username'))
+    data = $(ele).serializeArray();
+
+    $.post('loc_save_data.php?',
+      data,
+      function(data, status) {
+        if (data.indexOf('Duplicate entry') > 0) {
+          alert('同名地点已存在！')
+        } else {
+          loadLoc();
+        };
+        //console.log(data);
+      })
+  }
+
+</script>
